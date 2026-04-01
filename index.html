@@ -118,9 +118,9 @@
   /* ── Jokes ── */
   .joke-controls {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-direction: column;
     align-items: center;
+    gap: 12px;
     margin-bottom: 20px;
   }
   .category-select {
@@ -489,19 +489,23 @@
   <!-- ── JOKES ── -->
   <div id="panel-jokes" class="panel active">
     <div class="card">
-      <div class="card-title">Random Joke Generator</div>
+      <div class="card-title" style="text-align:center;">Random Joke Generator</div>
       <div class="joke-controls">
-        <select class="category-select" id="joke-category">
-          <option value="Any">🎲 Any Category</option>
-          <option value="Programming">💻 Programming</option>
-          <option value="Misc">🌀 Miscellaneous</option>
-          <option value="Dark">🌑 Dark</option>
-          <option value="Pun">😑 Puns</option>
-          <option value="Spooky">👻 Spooky</option>
-          <option value="Christmas">🎄 Christmas</option>
-        </select>
-        <button class="btn btn-primary" onclick="fetchJoke()">Get Joke 🎲</button>
-        <button class="btn btn-secondary" id="reveal-btn" onclick="revealPunchline()">Reveal Punchline 👀</button>
+        <div style="width:100%; display:flex; justify-content:center;">
+          <select class="category-select" id="joke-category">
+            <option value="Any">🎲 Any Category</option>
+            <option value="Programming">💻 Programming</option>
+            <option value="Misc">🌀 Miscellaneous</option>
+            <option value="Dark">🌑 Dark</option>
+            <option value="Pun">😑 Puns</option>
+            <option value="Spooky">👻 Spooky</option>
+            <option value="Christmas">🎄 Christmas</option>
+          </select>
+        </div>
+        <div style="width:100%; display:flex; justify-content:center; gap:10px;">
+          <button class="btn btn-primary" onclick="fetchJoke()">Get Joke 🎲</button>
+          <button class="btn btn-secondary" id="reveal-btn" onclick="revealPunchline()">Reveal Punchline 👀</button>
+        </div>
       </div>
       <div id="joke-display">
         <div class="loading-joke" id="joke-prompt"></div>
