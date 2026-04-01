@@ -336,7 +336,7 @@
     display: none; align-items: center; justify-content: center;
     font-weight: bold;
   }
-  .meme-thumb:hover .meme-thumb-del { display: flex; }
+  .meme-thumb.shift-held .meme-thumb-del { display: flex; }
 
   .hall-controls {
     display: flex;
@@ -1106,6 +1106,14 @@ function showToast(msg, isError = false) {
   t.className = isError ? 'error show' : 'show';
   setTimeout(() => t.className = '', 3000);
 }
+
+// Secret delete — hold Shift to reveal delete buttons on thumbnails
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Shift') document.querySelectorAll('.meme-thumb').forEach(t => t.classList.add('shift-held'));
+});
+document.addEventListener('keyup', (e) => {
+  if (e.key === 'Shift') document.querySelectorAll('.meme-thumb').forEach(t => t.classList.remove('shift-held'));
+});
 
 // ─────────────────────────────────────────────
 // INIT
