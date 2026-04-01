@@ -149,7 +149,7 @@
   .joke-punchline { font-size: 1.05rem; color: var(--accent); font-weight: 700; display: none; line-height: 1.5; }
   .joke-single { font-size: 1.05rem; line-height: 1.7; }
   .joke-meta { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
-  .loading-joke { color: var(--muted); font-style: italic; font-size: 0.95rem; }
+  .loading-joke { color: var(--muted); font-style: italic; font-size: 0.95rem; white-space: pre-line; text-align: center; }
   #reveal-btn { display: none; margin-top: 4px; }
 
   /* ── Meme Creator ── */
@@ -1250,13 +1250,13 @@ function setJokePrompt() {
   const hour = new Date().getHours();
   let msg;
   if (hour >= 5 && hour < 12)
-    msg = '↑ Hit "Get Joke" to ruin someone\'s morning';
+    msg = '↑\nHit "Get Joke" to ruin someone\'s morning';
   else if (hour >= 12 && hour < 17)
-    msg = '↑ Hit "Get Joke" to ruin someone\'s afternoon';
+    msg = '↑\nHit "Get Joke" to ruin someone\'s afternoon';
   else if (hour >= 17 && hour < 21)
-    msg = '↑ Hit "Get Joke" to ruin someone\'s evening';
+    msg = '↑\nHit "Get Joke" to ruin someone\'s evening';
   else
-    msg = '↑ Hit "Get Joke" — shouldn\'t you be asleep?';
+    msg = '↑\nShouldn\'t you be asleep?';
   document.getElementById('joke-prompt').textContent = msg;
 }
 
