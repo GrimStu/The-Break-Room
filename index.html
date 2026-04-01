@@ -457,7 +457,7 @@
         <button class="btn btn-secondary" id="reveal-btn" onclick="revealPunchline()">Reveal Punchline 👀</button>
       </div>
       <div id="joke-display">
-        <div class="loading-joke">Hit "Get Joke" to ruin someone's afternoon ↑</div>
+        <div class="loading-joke" id="joke-prompt"></div>
       </div>
     </div>
   </div>
@@ -1110,8 +1110,23 @@ function showToast(msg, isError = false) {
 // ─────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────
+function setJokePrompt() {
+  const hour = new Date().getHours();
+  let msg;
+  if (hour >= 5 && hour < 12)
+    msg = '← Hit "Get Joke" to ruin someone\'s morning';
+  else if (hour >= 12 && hour < 17)
+    msg = '← Hit "Get Joke" to ruin someone\'s afternoon';
+  else if (hour >= 17 && hour < 21)
+    msg = '← Hit "Get Joke" to ruin someone\'s evening';
+  else
+    msg = '← Hit "Get Joke" — shouldn\'t you be asleep?';
+  document.getElementById('joke-prompt').textContent = msg;
+}
+
 buildTemplateGrid();
 initCanvasDrag();
+setJokePrompt();
 </script>
 </body>
 </html>
