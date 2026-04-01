@@ -3,10 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Break Room</title>
+<title>The Break Room</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bangers&family=DM+Sans:wght@400;500;600&display=swap');
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
@@ -16,17 +14,19 @@
     --border: #2e2e40;
     --accent: #f5c842;
     --accent2: #e8563a;
+    --accent3: #4ecdc4;
     --text: #e8e6f0;
     --muted: #7a7890;
     --radius: 12px;
   }
 
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    padding: 0;
   }
 
   /* ── Header ── */
@@ -36,48 +36,38 @@
     padding: 18px 20px 14px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
   }
-  header .logo {
-    font-family: 'Bangers', cursive;
-    font-size: 2.4rem;
-    letter-spacing: 2px;
+  .logo {
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: 3px;
     color: var(--accent);
-    line-height: 1;
-  }
-  header .sub {
-    font-size: 0.8rem;
-    color: var(--muted);
-    letter-spacing: 1px;
     text-transform: uppercase;
   }
 
   /* ── Tabs ── */
   .tabs {
     display: flex;
-    gap: 0;
     padding: 0 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
   }
   .tab-btn {
-    padding: 14px 28px;
+    padding: 14px 22px;
     background: none;
     border: none;
     color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.95rem;
+    font-family: inherit;
+    font-size: 0.92rem;
     font-weight: 600;
     cursor: pointer;
     border-bottom: 3px solid transparent;
     transition: all 0.2s;
-    letter-spacing: 0.5px;
   }
   .tab-btn:hover { color: var(--text); }
-  .tab-btn.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  /* ── Main ── */
   main { padding: 16px 20px; max-width: 100%; margin: 0 auto; }
 
   .panel { display: none; }
@@ -88,15 +78,16 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 28px;
-    margin-bottom: 20px;
+    padding: 24px;
+    margin-bottom: 18px;
   }
   .card-title {
-    font-family: 'Bangers', cursive;
-    font-size: 1.5rem;
-    letter-spacing: 1px;
+    font-size: 1.1rem;
+    font-weight: 700;
     color: var(--accent);
     margin-bottom: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
   }
 
   /* ── Buttons ── */
@@ -104,69 +95,27 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 11px 22px;
+    padding: 10px 20px;
     border-radius: 8px;
     border: none;
-    font-family: 'DM Sans', sans-serif;
+    font-family: inherit;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     cursor: pointer;
     transition: all 0.15s;
-    letter-spacing: 0.3px;
   }
-  .btn-primary {
-    background: var(--accent);
-    color: #111;
-  }
+  .btn-primary { background: var(--accent); color: #111; }
   .btn-primary:hover { background: #ffd44d; transform: translateY(-1px); }
-  .btn-secondary {
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
   .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-danger {
-    background: var(--accent2);
-    color: #fff;
-  }
+  .btn-hall { background: var(--accent3); color: #111; }
+  .btn-hall:hover { background: #6eddd5; transform: translateY(-1px); }
+  .btn-danger { background: var(--accent2); color: #fff; }
   .btn-danger:hover { background: #f0694f; }
   .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-  /* ── Joke section ── */
-  #joke-display {
-    min-height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 12px;
-    text-align: center;
-  }
-  .joke-setup {
-    font-size: 1.15rem;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1.5;
-  }
-  .joke-punchline {
-    font-size: 1.1rem;
-    color: var(--accent);
-    font-weight: 600;
-    display: none;
-    line-height: 1.5;
-  }
-  .joke-single {
-    font-size: 1.1rem;
-    color: var(--text);
-    line-height: 1.6;
-  }
-  .joke-meta {
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-  #reveal-btn { display: none; margin-top: 12px; }
-
+  /* ── Jokes ── */
   .joke-controls {
     display: flex;
     flex-wrap: wrap;
@@ -180,22 +129,30 @@
     color: var(--text);
     border-radius: 8px;
     padding: 10px 14px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
+    font-family: inherit;
+    font-size: 0.88rem;
     cursor: pointer;
     outline: none;
   }
   .category-select:focus { border-color: var(--accent); }
-
-  .loading-joke {
-    color: var(--muted);
-    font-style: italic;
-    font-size: 0.95rem;
+  #joke-display {
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    padding: 8px 0;
   }
+  .joke-setup { font-size: 1.1rem; font-weight: 500; line-height: 1.6; }
+  .joke-punchline { font-size: 1.05rem; color: var(--accent); font-weight: 700; display: none; line-height: 1.5; }
+  .joke-single { font-size: 1.05rem; line-height: 1.7; }
+  .joke-meta { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+  .loading-joke { color: var(--muted); font-style: italic; font-size: 0.95rem; }
+  #reveal-btn { display: none; margin-top: 4px; }
 
-
-
-  /* ── Meme section ── */
+  /* ── Meme Creator ── */
   .meme-templates {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -212,141 +169,204 @@
   }
   .template-card:hover { border-color: var(--accent); transform: translateY(-2px); }
   .template-card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(245,200,66,0.3); }
-  .template-card img {
-    width: 100%;
-    height: 130px;
-    object-fit: cover;
-    display: block;
-  }
+  .template-card img { width: 100%; height: 110px; object-fit: cover; display: block; }
   .template-label {
     background: var(--surface2);
-    padding: 6px 10px;
-    font-size: 0.75rem;
+    padding: 5px 8px;
+    font-size: 0.72rem;
     font-weight: 600;
     color: var(--muted);
     text-align: center;
-    letter-spacing: 0.5px;
   }
   .template-card.selected .template-label { color: var(--accent); }
   .selected-check {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    background: var(--accent);
-    color: #111;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
+    position: absolute; top: 6px; right: 6px;
+    background: var(--accent); color: #111;
+    border-radius: 50%; width: 20px; height: 20px;
+    display: none; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: bold;
   }
   .template-card.selected .selected-check { display: flex; }
 
   .upload-zone {
     border: 2px dashed var(--border);
     border-radius: 10px;
-    padding: 24px;
+    padding: 20px;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
     margin-bottom: 16px;
   }
   .upload-zone:hover { border-color: var(--accent); background: rgba(245,200,66,0.03); }
-  .upload-zone p { color: var(--muted); font-size: 0.9rem; margin-top: 8px; }
-  .upload-zone .upload-icon { font-size: 2rem; }
+  .upload-zone p { color: var(--muted); font-size: 0.88rem; margin-top: 6px; }
   #upload-input { display: none; }
 
-  .meme-text-inputs { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
-  .text-field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
+  .meme-text-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .text-field { display: flex; flex-direction: column; gap: 5px; }
   .text-field label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase;
   }
-  .text-field input {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-family: 'Bangers', cursive;
-    font-size: 1.1rem;
-    letter-spacing: 1px;
-    outline: none;
-    transition: border 0.2s;
-  }
-  .text-field input:focus { border-color: var(--accent); }
-  .text-field input::placeholder { color: var(--muted); font-size: 1rem; }
 
   .meme-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 16px;
-    align-items: center;
+    display: flex; flex-wrap: wrap;
+    gap: 12px; margin-bottom: 12px; align-items: center;
   }
-  .meme-option {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
+  .meme-option { display: flex; flex-direction: column; gap: 4px; }
   .meme-option label {
-    font-size: 0.75rem;
-    color: var(--muted);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 0.72rem; color: var(--muted);
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
   }
   .meme-option input[type=color] {
-    width: 44px;
-    height: 34px;
+    width: 44px; height: 32px;
     border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--surface2);
-    cursor: pointer;
-    padding: 2px;
+    border-radius: 6px; background: var(--surface2);
+    cursor: pointer; padding: 2px;
   }
-  .meme-option input[type=range] {
-    width: 100px;
-    accent-color: var(--accent);
-  }
+  .meme-option input[type=range] { width: 100px; accent-color: var(--accent); }
 
   #meme-canvas {
-    display: block;
-    max-width: 100%;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    margin: 20px auto;
+    display: block; max-width: 100%;
+    border-radius: 10px; border: 1px solid var(--border);
+    margin: 16px auto;
   }
 
-  .meme-btn-row {
+  .meme-btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  /* ── Hall of Memes ── */
+  .hall-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .hall-empty .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+  .hall-empty p { font-size: 0.95rem; line-height: 1.6; }
+
+  /* Carousel */
+  .carousel-wrap {
+    position: relative;
+    background: #000;
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 20px;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .carousel-img {
+    max-width: 100%;
+    max-height: 520px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    transition: opacity 0.4s;
+  }
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.6);
+    border: none;
+    color: var(--accent);
+    font-size: 1.8rem;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s;
+    z-index: 10;
+  }
+  .carousel-btn:hover { background: rgba(0,0,0,0.85); }
+  .carousel-prev { left: 10px; }
+  .carousel-next { right: 10px; }
+  .carousel-counter {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.6);
+    color: var(--text);
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .dot.active { background: var(--accent); }
+
+  /* Meme grid thumbnails */
+  .meme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .meme-thumb {
+    position: relative;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    aspect-ratio: 1;
+  }
+  .meme-thumb:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .meme-thumb.active-thumb { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(245,200,66,0.3); }
+  .meme-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .meme-thumb-del {
+    position: absolute; top: 4px; right: 4px;
+    background: rgba(232,86,58,0.9);
+    border: none; color: #fff;
+    border-radius: 50%; width: 22px; height: 22px;
+    font-size: 12px; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    font-weight: bold;
+  }
+  .meme-thumb:hover .meme-thumb-del { display: flex; }
+
+  .hall-controls {
     display: flex;
     gap: 10px;
+    align-items: center;
     flex-wrap: wrap;
-    margin-top: 12px;
+    margin-bottom: 16px;
+  }
+  .hall-status {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-style: italic;
   }
 
-  /* ── Divider ── */
-  .section-divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 24px 0;
+  /* Auto-play toggle */
+  .autoplay-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
   }
+  .autoplay-label input { accent-color: var(--accent); width: 16px; height: 16px; }
 
   /* ── Spinner ── */
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner {
-    width: 20px;
-    height: 20px;
+    width: 20px; height: 20px;
     border: 2px solid var(--border);
     border-top-color: var(--accent);
     border-radius: 50%;
@@ -356,43 +376,73 @@
 
   /* ── Toast ── */
   #toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--accent);
-    color: #111;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.3s;
-    z-index: 999;
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--accent); color: #111;
+    padding: 10px 18px; border-radius: 8px;
+    font-weight: 600; font-size: 0.85rem;
+    opacity: 0; transform: translateY(10px);
+    transition: all 0.3s; z-index: 9999;
+    pointer-events: none;
   }
   #toast.show { opacity: 1; transform: translateY(0); }
+  #toast.error { background: var(--accent2); color: #fff; }
+
+  /* ── Upload modal overlay ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+  }
+  .modal-box h3 { color: var(--accent); margin-bottom: 12px; font-size: 1.1rem; }
+  .modal-box p { color: var(--muted); font-size: 0.88rem; margin-bottom: 20px; line-height: 1.6; }
+  .modal-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    margin-bottom: 16px;
+    transition: border 0.2s;
+  }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-btn-row { display: flex; gap: 10px; justify-content: center; }
 </style>
 </head>
 <body>
 
 <header>
-  <div>
-    <div class="logo">☕ BREAK ROOM</div>
-  </div>
+  <div class="logo">☕ The Break Room</div>
 </header>
 
 <div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('jokes')">🎭 Joke Generator</button>
-  <button class="tab-btn" onclick="switchTab('memes')">🖼️ Meme Generator</button>
+  <button class="tab-btn active" onclick="switchTab('jokes', this)">🎭 Joke Generator</button>
+  <button class="tab-btn" onclick="switchTab('memes', this)">🖼️ Meme Creator</button>
+  <button class="tab-btn" onclick="switchTab('hall', this)">🏆 Hall of Memes</button>
 </div>
 
 <main>
 
-  <!-- ── JOKES PANEL ── -->
+  <!-- ── JOKES ── -->
   <div id="panel-jokes" class="panel active">
     <div class="card">
       <div class="card-title">Random Joke Generator</div>
-
       <div class="joke-controls">
         <select class="category-select" id="joke-category">
           <option value="Any">🎲 Any Category</option>
@@ -403,34 +453,23 @@
           <option value="Spooky">👻 Spooky</option>
           <option value="Christmas">🎄 Christmas</option>
         </select>
-        <button class="btn btn-primary" onclick="fetchJoke()">
-          <span>Get Joke</span>
-          <span>🎲</span>
-        </button>
-        <button class="btn btn-secondary" id="reveal-btn" onclick="revealPunchline()">
-          Reveal Punchline 👀
-        </button>
+        <button class="btn btn-primary" onclick="fetchJoke()">Get Joke 🎲</button>
+        <button class="btn btn-secondary" id="reveal-btn" onclick="revealPunchline()">Reveal Punchline 👀</button>
       </div>
-
       <div id="joke-display">
         <div class="loading-joke">Hit "Get Joke" to ruin someone's afternoon ↑</div>
       </div>
     </div>
-
-
   </div>
 
-  <!-- ── MEMES PANEL ── -->
+  <!-- ── MEME CREATOR ── -->
   <div id="panel-memes" class="panel">
     <div class="card">
       <div class="card-title">Choose a Template</div>
-
       <div class="meme-templates" id="template-grid"></div>
-
       <hr class="section-divider">
-
       <div class="upload-zone" onclick="document.getElementById('upload-input').click()">
-        <div class="upload-icon">📁</div>
+        <div style="font-size:2rem;">📁</div>
         <p>Or upload your own image</p>
         <p style="font-size:0.75rem; margin-top:4px;">JPG, PNG, GIF — any size</p>
       </div>
@@ -461,7 +500,7 @@
           <input type="color" id="outline-color" value="#000000" oninput="drawMeme()">
         </div>
       </div>
-      <div class="meme-options" style="margin-top:4px;">
+      <div class="meme-options" style="margin-top:0;">
         <div class="meme-option">
           <label>Line 1 Size</label>
           <input type="range" id="font-size-1" min="12" max="80" value="40" oninput="updateSizeLabel(0);drawMeme()">
@@ -473,7 +512,7 @@
           <span id="font-size-2-val" style="font-size:0.75rem;color:var(--muted);">40</span>
         </div>
       </div>
-      <div class="meme-options" style="margin-top:4px;">
+      <div class="meme-options" style="margin-top:0;">
         <div class="meme-option">
           <label>Line 1 Angle</label>
           <input type="range" id="rotate-1" min="-45" max="45" value="0" oninput="updateRotateLabel(0);drawMeme()">
@@ -486,76 +525,114 @@
         </div>
       </div>
 
-      <p style="font-size:0.75rem; color:var(--muted); margin-bottom:6px;">💡 Drag text to reposition · Use angle sliders to tilt · Press Enter in the text box for a new line</p>
-      <p style="font-size:0.75rem; color:var(--muted); margin-bottom:8px;">📥 To save your meme — use the Snipping Tool, or <a href="https://grimstu.github.io/Break-Room/" target="_blank" style="color:var(--accent); text-decoration:underline;">click here to open in your browser</a> and use the Download button from there.</p>
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">💡 Drag text to reposition · Use angle sliders to tilt · Press Enter for a new line</p>
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">📥 To save — use Snipping Tool, or <a href="https://grimstu.github.io/The-Break-Room/" target="_blank" style="color:var(--accent);text-decoration:underline;">open in browser</a> and use Download.</p>
+
       <canvas id="meme-canvas" width="600" height="400" style="cursor:grab;"></canvas>
 
       <div class="meme-btn-row">
-        <button class="btn btn-primary" onclick="downloadMeme()">⬇️ Download Meme</button>
+        <button class="btn btn-primary" onclick="downloadMeme()">⬇️ Download</button>
+        <button class="btn btn-hall" id="share-btn" onclick="openShareModal()">🏆 Share to Hall of Memes</button>
         <button class="btn btn-secondary" onclick="resetMeme()">🔄 Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HALL OF MEMES ── -->
+  <div id="panel-hall" class="panel">
+    <div class="card">
+      <div class="card-title">🏆 Hall of Memes</div>
+
+      <div class="hall-controls">
+        <button class="btn btn-secondary" onclick="loadHall()">🔄 Refresh</button>
+        <label class="autoplay-label">
+          <input type="checkbox" id="autoplay-toggle" checked onchange="toggleAutoplay()">
+          Auto-rotate
+        </label>
+        <span class="hall-status" id="hall-status">Loading...</span>
+      </div>
+
+      <div id="hall-content">
+        <div class="hall-empty">
+          <div class="empty-icon">🖼️</div>
+          <p>No memes yet — be the first!<br>Create one in the Meme Creator tab and hit "Share to Hall of Memes".</p>
+        </div>
       </div>
     </div>
   </div>
 
 </main>
 
-<div id="toast">Copied to clipboard!</div>
+<!-- ── Share Modal ── -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal-box">
+    <h3>🏆 Share to Hall of Memes</h3>
+    <p>Add your name so the team knows who made this masterpiece.</p>
+    <input type="text" class="modal-input" id="creator-name" placeholder="Your name (optional)" maxlength="30">
+    <div class="modal-btn-row">
+      <button class="btn btn-hall" id="confirm-share-btn" onclick="submitToHall()">Share It! 🚀</button>
+      <button class="btn btn-secondary" onclick="closeShareModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
 
 <script>
-// ──────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────────
+const CLOUDINARY_CLOUD = 'dve4uiz78';
+const CLOUDINARY_PRESET = 'The Break Room';
+const JSONBIN_ID  = '69cd2d4b36566621a86cd2d7';
+const JSONBIN_KEY = '$2a$10$.K6tyoVPu7VEEVTiLauLIezGoBkxg3yvLxHlE/2IA3KHxz85aNoom';
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+
+// ─────────────────────────────────────────────
 // TABS
-// ──────────────────────────────────────────────
-function switchTab(name) {
+// ─────────────────────────────────────────────
+function switchTab(name, btn) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
-  event.target.classList.add('active');
+  btn.classList.add('active');
+  if (name === 'hall') loadHall();
 }
 
-// ──────────────────────────────────────────────
+// ─────────────────────────────────────────────
 // JOKES
-// ──────────────────────────────────────────────
+// ─────────────────────────────────────────────
 let currentJoke = null;
 
 async function fetchJoke() {
   const display = document.getElementById('joke-display');
   const revealBtn = document.getElementById('reveal-btn');
   const category = document.getElementById('joke-category').value;
-
   display.innerHTML = '<span class="spinner"></span>';
   revealBtn.style.display = 'none';
-
   try {
     const blacklist = 'nsfw,racist,sexist,explicit';
     let url = `https://v2.jokeapi.dev/joke/${category}?blacklistFlags=${blacklist}`;
     let res = await fetch(url);
     let data = await res.json();
-
-    // If no joke found for category, fall back to Any
     if (data.error && category !== 'Any') {
       url = `https://v2.jokeapi.dev/joke/Any?blacklistFlags=${blacklist}`;
       res = await fetch(url);
       data = await res.json();
     }
-
     if (data.error) throw new Error(data.message);
-
     currentJoke = data;
-
     if (data.type === 'twopart') {
       display.innerHTML = `
         <div class="joke-setup">${escHtml(data.setup)}</div>
         <div class="joke-punchline" id="punchline">${escHtml(data.delivery)}</div>
-        <div class="joke-meta">📚 ${data.category} · JokeAPI</div>
-      `;
+        <div class="joke-meta">📚 ${data.category} · JokeAPI</div>`;
       revealBtn.style.display = 'inline-flex';
     } else {
       display.innerHTML = `
         <div class="joke-single">${escHtml(data.joke)}</div>
-        <div class="joke-meta">📚 ${data.category} · JokeAPI</div>
-      `;
+        <div class="joke-meta">📚 ${data.category} · JokeAPI</div>`;
     }
-
   } catch (err) {
     display.innerHTML = `<div class="loading-joke" style="color:var(--accent2)">Couldn't load a joke. Check your connection.<br><small>${err.message}</small></div>`;
   }
@@ -563,10 +640,7 @@ async function fetchJoke() {
 
 function revealPunchline() {
   const p = document.getElementById('punchline');
-  if (p) {
-    p.style.display = 'block';
-    document.getElementById('reveal-btn').style.display = 'none';
-  }
+  if (p) { p.style.display = 'block'; document.getElementById('reveal-btn').style.display = 'none'; }
 }
 
 function escHtml(str) {
@@ -575,28 +649,23 @@ function escHtml(str) {
   return d.innerHTML;
 }
 
-// ──────────────────────────────────────────────
-// MEMES
-// ──────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// MEME CREATOR
+// ─────────────────────────────────────────────
 const TEMPLATES = [
-  { name: 'Drake',           url: 'https://i.imgflip.com/30b1gx.jpg' },
-  { name: 'Distracted BF',  url: 'https://i.imgflip.com/1ur9b0.jpg' },
-  { name: 'This Is Fine',   url: 'https://i.imgflip.com/wxica.jpg' },
-  { name: 'Expanding Brain',url: 'https://i.imgflip.com/1jwhww.jpg' },
-  { name: 'Two Buttons',    url: 'https://i.imgflip.com/1g8my4.jpg' },
-  { name: 'Pikachu',        url: 'https://i.imgflip.com/2kbn1e.jpg' },
+  { name: 'Drake',          url: 'https://i.imgflip.com/30b1gx.jpg' },
+  { name: 'Distracted BF', url: 'https://i.imgflip.com/1ur9b0.jpg' },
+  { name: 'This Is Fine',  url: 'https://i.imgflip.com/wxica.jpg' },
+  { name: 'Expanding Brain',url:'https://i.imgflip.com/1jwhww.jpg' },
+  { name: 'Two Buttons',   url: 'https://i.imgflip.com/1g8my4.jpg' },
+  { name: 'Pikachu',       url: 'https://i.imgflip.com/2kbn1e.jpg' },
 ];
 
 let selectedImage = null;
-let selectedTemplateIndex = null;
 let dragging = null;
 let dragOffset = { x: 0, y: 0 };
-let canvasW = 1, canvasH = 1; // track logical size separately
-
-let textPos = [
-  { x: 0.5, y: 0.08 },
-  { x: 0.5, y: 0.92 },
-];
+let canvasW = 1, canvasH = 1;
+let textPos = [{ x: 0.5, y: 0.08 }, { x: 0.5, y: 0.92 }];
 
 function resetTextPositions() {
   textPos = [{ x: 0.5, y: 0.08 }, { x: 0.5, y: 0.92 }];
@@ -609,14 +678,12 @@ function buildTemplateGrid() {
       <img src="${t.url}" alt="${t.name}" crossorigin="anonymous">
       <div class="template-label">${t.name}</div>
       <div class="selected-check">✓</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function selectTemplate(index) {
   document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
   document.getElementById('tpl-' + index).classList.add('selected');
-  selectedTemplateIndex = index;
   const img = new Image();
   img.crossOrigin = 'anonymous';
   img.onload = () => { selectedImage = img; resetTextPositions(); showEditor(); drawMeme(); };
@@ -632,11 +699,8 @@ function handleUpload(event) {
     const img = new Image();
     img.onload = () => {
       selectedImage = img;
-      selectedTemplateIndex = null;
       document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
-      resetTextPositions();
-      showEditor();
-      drawMeme();
+      resetTextPositions(); showEditor(); drawMeme();
     };
     img.src = e.target.result;
   };
@@ -644,18 +708,16 @@ function handleUpload(event) {
 }
 
 function showEditor() {
-  const editor = document.getElementById('meme-editor');
-  editor.style.display = 'block';
-  editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const ed = document.getElementById('meme-editor');
+  ed.style.display = 'block';
+  ed.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Get position within canvas accounting for CSS scaling
 function getCanvasPos(e) {
   const canvas = document.getElementById('meme-canvas');
   const rect = canvas.getBoundingClientRect();
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  // Scale from display pixels to canvas pixels
   return {
     x: (clientX - rect.left) * (canvasW / rect.width),
     y: (clientY - rect.top)  * (canvasH / rect.height),
@@ -668,17 +730,13 @@ function hitTestText(pos) {
     const hitH = fontSize * 1.8;
     const tx = textPos[i].x * canvasW;
     const ty = textPos[i].y * canvasH;
-    if (Math.abs(pos.x - tx) < canvasW * 0.45 && Math.abs(pos.y - ty) < hitH / 2) {
-      return i;
-    }
+    if (Math.abs(pos.x - tx) < canvasW * 0.45 && Math.abs(pos.y - ty) < hitH / 2) return i;
   }
   return null;
 }
 
-// Attach drag listeners once to canvas on page load
 function initCanvasDrag() {
   const canvas = document.getElementById('meme-canvas');
-
   canvas.addEventListener('mousedown', (e) => {
     if (!selectedImage) return;
     const pos = getCanvasPos(e);
@@ -691,40 +749,32 @@ function initCanvasDrag() {
       e.preventDefault();
     }
   });
-
   canvas.addEventListener('mousemove', (e) => {
     if (dragging === null || !selectedImage) return;
     const pos = getCanvasPos(e);
     textPos[dragging].x = Math.min(0.98, Math.max(0.02, (pos.x - dragOffset.x) / canvasW));
     textPos[dragging].y = Math.min(0.98, Math.max(0.02, (pos.y - dragOffset.y) / canvasH));
-    drawMeme();
-    e.preventDefault();
+    drawMeme(); e.preventDefault();
   });
-
   canvas.addEventListener('mouseup',    () => { dragging = null; canvas.style.cursor = 'grab'; drawMeme(); });
   canvas.addEventListener('mouseleave', () => { dragging = null; canvas.style.cursor = 'grab'; drawMeme(); });
-
   canvas.addEventListener('touchstart', (e) => {
     if (!selectedImage) return;
     const pos = getCanvasPos(e);
     const hit = hitTestText(pos);
     if (hit !== null) { dragging = hit; dragOffset.x = pos.x - textPos[hit].x * canvasW; dragOffset.y = pos.y - textPos[hit].y * canvasH; e.preventDefault(); }
   }, { passive: false });
-
   canvas.addEventListener('touchmove', (e) => {
     if (dragging === null) return;
     const pos = getCanvasPos(e);
     textPos[dragging].x = Math.min(0.98, Math.max(0.02, (pos.x - dragOffset.x) / canvasW));
     textPos[dragging].y = Math.min(0.98, Math.max(0.02, (pos.y - dragOffset.y) / canvasH));
-    drawMeme();
-    e.preventDefault();
+    drawMeme(); e.preventDefault();
   }, { passive: false });
-
   canvas.addEventListener('touchend', () => { dragging = null; drawMeme(); });
 }
 
 function wrapText(ctx, text, maxWidth) {
-  // Split by user newlines first, then wrap each line by word
   const paragraphs = text.split('\n');
   const result = [];
   for (const para of paragraphs) {
@@ -733,12 +783,8 @@ function wrapText(ctx, text, maxWidth) {
     let current = '';
     for (const word of words) {
       const test = current ? current + ' ' + word : word;
-      if (ctx.measureText(test).width > maxWidth && current) {
-        result.push(current);
-        current = word;
-      } else {
-        current = test;
-      }
+      if (ctx.measureText(test).width > maxWidth && current) { result.push(current); current = word; }
+      else current = test;
     }
     if (current) result.push(current);
   }
@@ -746,8 +792,7 @@ function wrapText(ctx, text, maxWidth) {
 }
 
 function drawMultilineText(ctx, text, x, y, fontSize, lineHeight) {
-  const maxWidth = canvasW * 0.88;
-  const lines = wrapText(ctx, text, maxWidth);
+  const lines = wrapText(ctx, text, canvasW * 0.88);
   const totalH = (lines.length - 1) * lineHeight;
   lines.forEach((line, i) => {
     const ly = y - totalH / 2 + i * lineHeight;
@@ -762,82 +807,57 @@ function drawMeme() {
   const ctx = canvas.getContext('2d');
   const topText    = (document.getElementById('top-text').value || '').toUpperCase();
   const bottomText = (document.getElementById('bottom-text').value || '').toUpperCase();
-  const textColor   = document.getElementById('text-color').value;
+  const textColor  = document.getElementById('text-color').value;
   const outlineColor = document.getElementById('outline-color').value;
-  const fontSizes = [
+  const fontSizes  = [
     parseInt(document.getElementById('font-size-1').value),
     parseInt(document.getElementById('font-size-2').value),
   ];
-
   if (!selectedImage) return;
-
   const maxW = 540;
   const scale = Math.min(maxW / selectedImage.width, 1);
   canvasW = Math.round(selectedImage.width * scale);
   canvasH = Math.round(selectedImage.height * scale);
-  canvas.width  = canvasW;
-  canvas.height = canvasH;
-
+  canvas.width = canvasW; canvas.height = canvasH;
   ctx.drawImage(selectedImage, 0, 0, canvasW, canvasH);
-
-  ctx.textAlign    = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.strokeStyle  = outlineColor;
-  ctx.fillStyle    = textColor;
-  ctx.lineJoin     = 'round';
-
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.strokeStyle = outlineColor; ctx.fillStyle = textColor; ctx.lineJoin = 'round';
   const rotations = [
     parseInt(document.getElementById('rotate-1').value) * Math.PI / 180,
     parseInt(document.getElementById('rotate-2').value) * Math.PI / 180,
   ];
-
-  const texts = [topText, bottomText];
-
-  texts.forEach((text, i) => {
+  [topText, bottomText].forEach((text, i) => {
     if (!text.trim()) return;
     const fontSize = fontSizes[i];
     const lineHeight = fontSize * 1.15;
-    ctx.font      = `${fontSize}px Impact, Arial Black, sans-serif`;
+    ctx.font = `${fontSize}px Impact, Arial Black, sans-serif`;
     ctx.lineWidth = Math.max(2, fontSize / 9);
-
     const x = textPos[i].x * canvasW;
     const y = textPos[i].y * canvasH;
-
     ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rotations[i]);
-    ctx.translate(-x, -y);
-
+    ctx.translate(x, y); ctx.rotate(rotations[i]); ctx.translate(-x, -y);
     drawMultilineText(ctx, text, x, y, fontSize, lineHeight);
-
-    // Drag highlight
     if (dragging === i) {
       const lines = wrapText(ctx, text, canvasW * 0.88);
       const blockH = lines.length * lineHeight;
       ctx.save();
-      ctx.strokeStyle = 'rgba(245,200,66,0.7)';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([5, 3]);
-      ctx.strokeRect(x - canvasW * 0.44, y - blockH / 2 - 4, canvasW * 0.88, blockH + 8);
+      ctx.strokeStyle = 'rgba(245,200,66,0.7)'; ctx.lineWidth = 1.5; ctx.setLineDash([5,3]);
+      ctx.strokeRect(x - canvasW*0.44, y - blockH/2 - 4, canvasW*0.88, blockH+8);
       ctx.restore();
     }
-
     ctx.restore();
   });
 }
+
 function drawMemePlaceholder(name) {
   const canvas = document.getElementById('meme-canvas');
   const ctx = canvas.getContext('2d');
-  canvasW = canvas.width  = 540;
-  canvasH = canvas.height = 400;
-  ctx.fillStyle = '#22222f';
-  ctx.fillRect(0, 0, 540, 400);
-  ctx.fillStyle = '#7a7890';
-  ctx.font = '17px Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(`⚠️ Couldn't load "${name}" template`, 270, 190);
-  ctx.fillText('Try uploading your own image instead', 270, 218);
+  canvasW = canvas.width = 540; canvasH = canvas.height = 400;
+  ctx.fillStyle = '#22222f'; ctx.fillRect(0,0,540,400);
+  ctx.fillStyle = '#7a7890'; ctx.font = '17px Segoe UI, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(`⚠️ Couldn't load "${name}"`, 270, 185);
+  ctx.fillText('Try uploading your own image instead', 270, 215);
 }
 
 function downloadMeme() {
@@ -849,48 +869,247 @@ function downloadMeme() {
   showToast('Meme downloaded! 🎉');
 }
 
-function updateSizeLabel(index) {
-  const id = index === 0 ? 'font-size-1' : 'font-size-2';
-  const val = document.getElementById(id).value;
-  document.getElementById(id + '-val').textContent = val;
+function updateSizeLabel(i) {
+  const id = `font-size-${i+1}`;
+  document.getElementById(id+'-val').textContent = document.getElementById(id).value;
 }
-
-function updateRotateLabel(index) {
-  const id = index === 0 ? 'rotate-1' : 'rotate-2';
-  const val = document.getElementById(id).value;
-  document.getElementById(id + '-val').textContent = val + '°';
+function updateRotateLabel(i) {
+  const id = `rotate-${i+1}`;
+  document.getElementById(id+'-val').textContent = document.getElementById(id).value + '°';
 }
 
 function resetMeme() {
-  document.getElementById('top-text').value    = '';
+  document.getElementById('top-text').value = '';
   document.getElementById('bottom-text').value = '';
-  document.getElementById('font-size-1').value = 40;
-  document.getElementById('font-size-2').value = 40;
-  document.getElementById('font-size-1-val').textContent = '40';
-  document.getElementById('font-size-2-val').textContent = '40';
-  document.getElementById('text-color').value  = '#ffffff';
+  ['font-size-1','font-size-2'].forEach(id => { document.getElementById(id).value = 40; document.getElementById(id+'-val').textContent = '40'; });
+  document.getElementById('text-color').value = '#ffffff';
   document.getElementById('outline-color').value = '#000000';
-  document.getElementById('rotate-1').value = 0;
-  document.getElementById('rotate-2').value = 0;
-  document.getElementById('rotate-1-val').textContent = '0°';
-  document.getElementById('rotate-2-val').textContent = '0°';
+  ['rotate-1','rotate-2'].forEach(id => { document.getElementById(id).value = 0; document.getElementById(id+'-val').textContent = '0°'; });
   resetTextPositions();
   if (selectedImage) drawMeme();
 }
 
-// ──────────────────────────────────────────────
-// TOAST
-// ──────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+// ─────────────────────────────────────────────
+// SHARE MODAL
+// ─────────────────────────────────────────────
+function openShareModal() {
+  if (!selectedImage) { showToast('Create a meme first!', true); return; }
+  document.getElementById('creator-name').value = '';
+  document.getElementById('share-modal').classList.add('show');
+  setTimeout(() => document.getElementById('creator-name').focus(), 100);
 }
 
-// ──────────────────────────────────────────────
+function closeShareModal() {
+  document.getElementById('share-modal').classList.remove('show');
+}
+
+async function submitToHall() {
+  const btn = document.getElementById('confirm-share-btn');
+  const name = document.getElementById('creator-name').value.trim() || 'Anonymous';
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+
+  try {
+    // 1. Get canvas blob
+    const canvas = document.getElementById('meme-canvas');
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+
+    // 2. Upload to Cloudinary
+    const formData = new FormData();
+    formData.append('file', blob, 'meme.png');
+    formData.append('upload_preset', CLOUDINARY_PRESET);
+    formData.append('folder', 'break-room');
+
+    const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+    const uploadData = await uploadRes.json();
+    if (!uploadData.secure_url) throw new Error('Upload failed');
+
+    const imageUrl = uploadData.secure_url;
+
+    // 3. Fetch current JSONBin data
+    const getRes = await fetch(JSONBIN_URL + '/latest', {
+      headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    const getData = await getRes.json();
+    const memes = getData.record?.memes || [];
+
+    // 4. Add new meme entry
+    memes.unshift({
+      url: imageUrl,
+      creator: name,
+      date: new Date().toLocaleDateString('en-GB'),
+      id: Date.now(),
+    });
+
+    // 5. Save back to JSONBin
+    const putRes = await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_KEY,
+      },
+      body: JSON.stringify({ memes }),
+    });
+    if (!putRes.ok) throw new Error('Save failed');
+
+    closeShareModal();
+    showToast('🏆 Added to the Hall of Memes!');
+
+  } catch (err) {
+    showToast('Failed to share: ' + err.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Share It! 🚀';
+  }
+}
+
+// ─────────────────────────────────────────────
+// HALL OF MEMES
+// ─────────────────────────────────────────────
+let hallMemes = [];
+let hallIndex = 0;
+let autoplayTimer = null;
+
+async function loadHall() {
+  const status = document.getElementById('hall-status');
+  const content = document.getElementById('hall-content');
+  status.textContent = 'Loading...';
+  try {
+    const res = await fetch(JSONBIN_URL + '/latest', {
+      headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    const data = await res.json();
+    hallMemes = data.record?.memes || [];
+    status.textContent = `${hallMemes.length} meme${hallMemes.length !== 1 ? 's' : ''} in the hall`;
+
+    if (hallMemes.length === 0) {
+      content.innerHTML = `
+        <div class="hall-empty">
+          <div class="empty-icon">🖼️</div>
+          <p>No memes yet — be the first!<br>Create one in the Meme Creator tab and hit "Share to Hall of Memes".</p>
+        </div>`;
+      return;
+    }
+
+    hallIndex = 0;
+    renderHall();
+    startAutoplay();
+
+  } catch (err) {
+    status.textContent = 'Failed to load';
+    content.innerHTML = `<div class="hall-empty"><div class="empty-icon">⚠️</div><p>Couldn't load the Hall of Memes.<br><small>${err.message}</small></p></div>`;
+  }
+}
+
+function renderHall() {
+  const content = document.getElementById('hall-content');
+  const meme = hallMemes[hallIndex];
+
+  const dotsHtml = hallMemes.map((_, i) =>
+    `<div class="dot ${i === hallIndex ? 'active' : ''}" onclick="goToMeme(${i})"></div>`
+  ).join('');
+
+  const thumbsHtml = hallMemes.map((m, i) => `
+    <div class="meme-thumb ${i === hallIndex ? 'active-thumb' : ''}" onclick="goToMeme(${i})">
+      <img src="${m.url}" alt="Meme by ${escHtml(m.creator)}" loading="lazy">
+      <button class="meme-thumb-del" onclick="deleteMeme(event,${i})" title="Delete">✕</button>
+    </div>`).join('');
+
+  content.innerHTML = `
+    <div class="carousel-wrap">
+      <img class="carousel-img" src="${meme.url}" alt="Meme by ${escHtml(meme.creator)}">
+      ${hallMemes.length > 1 ? `
+        <button class="carousel-btn carousel-prev" onclick="prevMeme()">&#8249;</button>
+        <button class="carousel-btn carousel-next" onclick="nextMeme()">&#8250;</button>` : ''}
+      <div class="carousel-counter">${hallIndex + 1} / ${hallMemes.length} · by ${escHtml(meme.creator)} · ${meme.date}</div>
+    </div>
+    <div class="carousel-dots">${dotsHtml}</div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;">Click a thumbnail to jump · Hover for delete option</div>
+    <div class="meme-grid">${thumbsHtml}</div>
+  `;
+}
+
+function goToMeme(i) {
+  hallIndex = i;
+  renderHall();
+  resetAutoplay();
+}
+
+function nextMeme() {
+  hallIndex = (hallIndex + 1) % hallMemes.length;
+  renderHall(); resetAutoplay();
+}
+
+function prevMeme() {
+  hallIndex = (hallIndex - 1 + hallMemes.length) % hallMemes.length;
+  renderHall(); resetAutoplay();
+}
+
+function startAutoplay() {
+  clearInterval(autoplayTimer);
+  if (!document.getElementById('autoplay-toggle').checked) return;
+  autoplayTimer = setInterval(() => {
+    if (hallMemes.length > 1) { hallIndex = (hallIndex + 1) % hallMemes.length; renderHall(); }
+  }, 4000);
+}
+
+function resetAutoplay() {
+  clearInterval(autoplayTimer);
+  startAutoplay();
+}
+
+function toggleAutoplay() {
+  if (document.getElementById('autoplay-toggle').checked) startAutoplay();
+  else clearInterval(autoplayTimer);
+}
+
+async function deleteMeme(e, index) {
+  e.stopPropagation();
+  if (!confirm('Remove this meme from the Hall of Memes?')) return;
+  try {
+    hallMemes.splice(index, 1);
+    if (hallIndex >= hallMemes.length) hallIndex = Math.max(0, hallMemes.length - 1);
+
+    const res = await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
+      body: JSON.stringify({ memes: hallMemes }),
+    });
+    if (!res.ok) throw new Error('Delete failed');
+
+    document.getElementById('hall-status').textContent = `${hallMemes.length} meme${hallMemes.length !== 1 ? 's' : ''} in the hall`;
+    if (hallMemes.length === 0) {
+      document.getElementById('hall-content').innerHTML = `
+        <div class="hall-empty">
+          <div class="empty-icon">🖼️</div>
+          <p>No memes yet — be the first!</p>
+        </div>`;
+    } else {
+      renderHall();
+    }
+    showToast('Meme removed');
+  } catch (err) {
+    showToast('Failed to delete: ' + err.message, true);
+    await loadHall();
+  }
+}
+
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = isError ? 'error show' : 'show';
+  setTimeout(() => t.className = '', 3000);
+}
+
+// ─────────────────────────────────────────────
 // INIT
-// ──────────────────────────────────────────────
+// ─────────────────────────────────────────────
 buildTemplateGrid();
 initCanvasDrag();
 </script>
