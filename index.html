@@ -970,7 +970,7 @@ function downloadMeme() {
   link.download = 'meme.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
-  clearMemeText();
+  resetMeme();
   showToast('Meme downloaded! 🎉');
 }
 
@@ -1079,7 +1079,7 @@ async function submitToHall() {
     if (!putRes.ok) throw new Error('Save failed');
 
     closeShareModal();
-    clearMemeText();
+    resetMeme();
     showToast('🏆 Added to the Hall of Memes!');
 
   } catch (err) {
