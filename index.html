@@ -1053,7 +1053,7 @@ function startAutoplay() {
   if (!document.getElementById('autoplay-toggle').checked) return;
   autoplayTimer = setInterval(() => {
     if (hallMemes.length > 1) { hallIndex = (hallIndex + 1) % hallMemes.length; renderHall(); }
-  }, 4000);
+  }, 30000);
 }
 
 function resetAutoplay() {
