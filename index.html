@@ -1312,7 +1312,8 @@ async function generateImage() {
 
   const fullPrompt = currentStyleSuffix ? `${prompt}, ${currentStyleSuffix}` : prompt;
   const encodedPrompt = encodeURIComponent(fullPrompt);
-  const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=768&height=768&nologo=true&seed=${Date.now()}`;
+  const seed = Math.floor(Math.random() * 999999);
+  const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&seed=${seed}&model=flux`;
 
   const result = document.getElementById('ai-result');
   const loading = document.getElementById('ai-loading');
