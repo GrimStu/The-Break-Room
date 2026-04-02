@@ -434,6 +434,28 @@
   #toast.show { opacity: 1; transform: translateY(0); }
   #toast.error { background: var(--accent2); color: #fff; }
 
+  /* ── AI Image Generator ── */
+  .style-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .style-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .style-btn:hover { border-color: var(--accent); color: var(--text); }
+  .style-btn.active { background: var(--accent); color: #111; border-color: var(--accent); }
+
   /* ── Upload modal overlay ── */
   .modal-overlay {
     display: none;
@@ -482,6 +504,7 @@
   <button class="tab-btn active" onclick="switchTab('jokes', this)">🎭 Joke Generator</button>
   <button class="tab-btn" onclick="switchTab('memes', this)">🖼️ Meme Creator</button>
   <button class="tab-btn" onclick="switchTab('hall', this)">🏆 Hall of Memes</button>
+  <button class="tab-btn" onclick="switchTab('ai', this)">🎨 AI Images</button>
 </div>
 
 <main>
@@ -629,6 +652,50 @@
           <div class="empty-icon">🖼️</div>
           <p>No memes yet — be the first!<br>Create one in the Meme Creator tab and hit "Share to Hall of Memes".</p>
         </div>
+      </div>
+    </div>
+  <!-- ── AI IMAGE GENERATOR ── -->
+  <div id="panel-ai" class="panel">
+    <div class="card">
+      <div class="card-title" style="text-align:center;">🎨 AI Image Generator</div>
+      <p style="text-align:center;color:var(--muted);font-size:0.88rem;margin-bottom:16px;">Describe what you want to see — then meme it!</p>
+
+      <!-- Style presets -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:0.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;text-align:center;">Quick Style</div>
+        <div class="style-presets">
+          <button class="style-btn active" onclick="setStyle(this, '')">🎲 None</button>
+          <button class="style-btn" onclick="setStyle(this, 'photorealistic, detailed')">📷 Realistic</button>
+          <button class="style-btn" onclick="setStyle(this, 'cartoon style, colorful')">🎨 Cartoon</button>
+          <button class="style-btn" onclick="setStyle(this, 'cinematic, dramatic lighting')">🌌 Cinematic</button>
+          <button class="style-btn" onclick="setStyle(this, 'pixel art, retro game style')">👾 Pixel Art</button>
+          <button class="style-btn" onclick="setStyle(this, 'anime style, vibrant')">🎭 Anime</button>
+        </div>
+      </div>
+
+      <!-- Prompt input -->
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+        <textarea id="ai-prompt" rows="3" placeholder="e.g. A cat wearing a business suit presenting to a boardroom full of dogs..." style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:0.95rem;outline:none;resize:vertical;width:100%;transition:border 0.2s;"></textarea>
+        <div style="display:flex;justify-content:center;">
+          <button class="btn btn-primary" id="ai-generate-btn" onclick="generateImage()">✨ Generate Image</button>
+        </div>
+      </div>
+
+      <!-- Result area -->
+      <div id="ai-result" style="display:none;">
+        <div id="ai-loading" style="display:none;text-align:center;padding:40px 0;">
+          <div class="spinner" style="width:36px;height:36px;margin:0 auto 12px;"></div>
+          <p style="color:var(--muted);font-size:0.88rem;">Generating your image...<br><small>This can take 10–20 seconds</small></p>
+        </div>
+        <div id="ai-image-wrap" style="display:none;text-align:center;">
+          <img id="ai-image" src="" alt="Generated image" style="max-width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:14px;">
+          <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-hall" onclick="sendToMemeCreator()">🖼️ Send to Meme Creator</button>
+            <button class="btn btn-primary" onclick="downloadAiImage()">⬇️ Download</button>
+            <button class="btn btn-secondary" onclick="generateImage()">🔄 Regenerate</button>
+          </div>
+        </div>
+        <div id="ai-error" style="display:none;text-align:center;padding:20px;color:var(--accent2);font-size:0.88rem;"></div>
       </div>
     </div>
   </div>
@@ -1223,6 +1290,93 @@ async function deleteMeme(e, index) {
     showToast('Failed to delete: ' + err.message, true);
     await loadHall();
   }
+}
+
+// ─────────────────────────────────────────────
+// AI IMAGE GENERATOR
+// ─────────────────────────────────────────────
+let currentStyleSuffix = '';
+let currentAiImageUrl = '';
+
+function setStyle(btn, style) {
+  document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentStyleSuffix = style;
+}
+
+async function generateImage() {
+  const prompt = document.getElementById('ai-prompt').value.trim();
+  if (!prompt) { showToast('Enter a prompt first!', true); return; }
+
+  const fullPrompt = currentStyleSuffix ? `${prompt}, ${currentStyleSuffix}` : prompt;
+  const encodedPrompt = encodeURIComponent(fullPrompt);
+  const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=768&height=768&nologo=true&seed=${Date.now()}`;
+
+  const result = document.getElementById('ai-result');
+  const loading = document.getElementById('ai-loading');
+  const imageWrap = document.getElementById('ai-image-wrap');
+  const errorDiv = document.getElementById('ai-error');
+  const btn = document.getElementById('ai-generate-btn');
+
+  result.style.display = 'block';
+  loading.style.display = 'block';
+  imageWrap.style.display = 'none';
+  errorDiv.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
+
+  try {
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        currentAiImageUrl = imageUrl;
+        document.getElementById('ai-image').src = imageUrl;
+        loading.style.display = 'none';
+        imageWrap.style.display = 'block';
+        resolve();
+      };
+      img.onerror = () => reject(new Error('Image failed to load — try again'));
+      img.src = imageUrl;
+      setTimeout(() => reject(new Error('Timed out — try again')), 40000);
+    });
+  } catch (err) {
+    loading.style.display = 'none';
+    errorDiv.style.display = 'block';
+    errorDiv.textContent = `⚠️ ${err.message}`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ Generate Image';
+  }
+}
+
+function sendToMemeCreator() {
+  if (!currentAiImageUrl) return;
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    selectedImage = img;
+    document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+    resetTextPositions();
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-memes').classList.add('active');
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    showEditor();
+    drawMeme();
+    showToast('Image sent to Meme Creator! 🎨');
+  };
+  img.src = currentAiImageUrl;
+}
+
+function downloadAiImage() {
+  if (!currentAiImageUrl) return;
+  const link = document.createElement('a');
+  link.href = currentAiImageUrl;
+  link.download = 'ai-image.png';
+  link.target = '_blank';
+  link.click();
+  showToast('Image downloaded! 🎉');
 }
 
 // ─────────────────────────────────────────────
