@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Break Room</title>
+<title>The Break Room</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -497,7 +497,7 @@
 <body>
 
 <header>
-  <div class="logo">☕ Break Room</div>
+  <div class="logo">☕ The Break Room</div>
 </header>
 
 <div class="tabs">
@@ -621,7 +621,7 @@
       </div>
 
       <p style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">💡 Drag text to reposition · Use angle sliders to tilt · Press Enter for a new line</p>
-      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">📥 To save — use Snipping Tool, or <a href="https://grimstu.github.io/Break-Room/" target="_blank" style="color:var(--accent);text-decoration:underline;">open in browser</a> and use Download.</p>
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">📥 To save — use Snipping Tool, or <a href="https://grimstu.github.io/The-Break-Room/" target="_blank" style="color:var(--accent);text-decoration:underline;">open in browser</a> and use Download.</p>
 
       <canvas id="meme-canvas" width="600" height="400" style="cursor:grab;"></canvas>
 
@@ -677,7 +677,7 @@
 
       <!-- Prompt input -->
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-        <textarea id="ai-prompt" rows="3" placeholder="e.g. A cat wearing a business suit presenting to a boardroom full of dogs..." style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:0.95rem;outline:none;resize:vertical;width:100%;transition:border 0.2s;"></textarea>
+        <textarea id="ai-prompt" rows="3" placeholder="e.g. A cat wearing a business suit presenting to a boardroom full of dogs..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generateImage();}" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:0.95rem;outline:none;resize:vertical;width:100%;transition:border 0.2s;"></textarea>
         <div style="display:flex;justify-content:center;">
           <button class="btn btn-primary" id="ai-generate-btn" onclick="generateImage()">✨ Generate Image</button>
         </div>
@@ -708,7 +708,7 @@
 <div class="modal-overlay" id="share-modal">
   <div class="modal-box">
     <h3>🏆 Share to Hall of Memes</h3>
-    <p>Add your name so the group knows who made this masterpiece.</p>
+    <p>Add your name so the team knows who made this masterpiece.</p>
     <input type="text" class="modal-input" id="creator-name" placeholder="Your name (optional)" maxlength="30">
     <div class="modal-btn-row">
       <button class="btn btn-hall" id="confirm-share-btn" onclick="submitToHall()">Share It! 🚀</button>
@@ -724,8 +724,8 @@
 // CONFIG
 // ─────────────────────────────────────────────
 const CLOUDINARY_CLOUD = 'dve4uiz78';
-const CLOUDINARY_PRESET = 'Public Break Room';
-const JSONBIN_ID  = '69cd4c8caaba882197b61314';
+const CLOUDINARY_PRESET = 'The Break Room';
+const JSONBIN_ID  = '69cd2d4b36566621a86cd2d7';
 const JSONBIN_KEY = '$2a$10$.K6tyoVPu7VEEVTiLauLIezGoBkxg3yvLxHlE/2IA3KHxz85aNoom';
 const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
 
@@ -1313,7 +1313,7 @@ async function generateImage() {
   const fullPrompt = currentStyleSuffix ? `${prompt}, ${currentStyleSuffix}` : prompt;
   const encodedPrompt = encodeURIComponent(fullPrompt);
   const seed = Math.floor(Math.random() * 999999);
-  const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&seed=${seed}&model=flux`;
+  const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&seed=${seed}&model=turbo`;
 
   const result = document.getElementById('ai-result');
   const loading = document.getElementById('ai-loading');
