@@ -1327,6 +1327,7 @@ async function generateImage() {
   errorDiv.style.display = 'none';
   btn.disabled = true;
   btn.textContent = '⏳ Generating...';
+  document.getElementById('ai-prompt').value = '';
 
   // Set a timeout fallback
   const timeout = setTimeout(() => {
