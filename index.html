@@ -493,6 +493,7 @@
   .modal-input:focus { border-color: var(--accent); }
   .modal-btn-row { display: flex; gap: 10px; justify-content: center; }
 </style>
+<script src="https://js.puter.com/v2/"></script>
 </head>
 <body>
 
@@ -667,11 +668,11 @@
         <div style="font-size:0.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;text-align:center;">Quick Style</div>
         <div class="style-presets">
           <button class="style-btn active" onclick="setStyle(this, '')">🎲 None</button>
-          <button class="style-btn" onclick="setStyle(this, 'photorealistic, detailed')">📷 Realistic</button>
-          <button class="style-btn" onclick="setStyle(this, 'cartoon style, colorful')">🎨 Cartoon</button>
-          <button class="style-btn" onclick="setStyle(this, 'cinematic, dramatic lighting')">🌌 Cinematic</button>
-          <button class="style-btn" onclick="setStyle(this, 'pixel art, retro game style')">👾 Pixel Art</button>
-          <button class="style-btn" onclick="setStyle(this, 'anime style, vibrant')">🎭 Anime</button>
+          <button class="style-btn" onclick="setStyle(this, 'photorealistic, detailed photography')">📷 Realistic</button>
+          <button class="style-btn" onclick="setStyle(this, 'cartoon style, colorful illustration')">🎨 Cartoon</button>
+          <button class="style-btn" onclick="setStyle(this, 'cinematic, dramatic lighting, film still')">🌌 Cinematic</button>
+          <button class="style-btn" onclick="setStyle(this, 'pixel art, retro 8-bit game style')">👾 Pixel Art</button>
+          <button class="style-btn" onclick="setStyle(this, 'anime style, vibrant, Japanese animation')">🎭 Anime</button>
         </div>
       </div>
 
@@ -682,6 +683,7 @@
           <button class="btn btn-primary" id="ai-generate-btn" onclick="generateImage()">✨ Generate Image</button>
         </div>
       </div>
+      <p style="font-size:0.72rem;color:var(--muted);text-align:center;margin-bottom:12px;">⚡ Powered by Puter.js · Free · No sign-in required</p>
 
       <!-- Result area -->
       <div id="ai-result" style="display:none;">
@@ -1311,9 +1313,6 @@ async function generateImage() {
   if (!prompt) { showToast('Enter a prompt first!', true); return; }
 
   const fullPrompt = currentStyleSuffix ? `${prompt}, ${currentStyleSuffix}` : prompt;
-  const encodedPrompt = encodeURIComponent(fullPrompt);
-  const seed = Math.floor(Math.random() * 999999);
-  const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&seed=${seed}&model=turbo`;
 
   const result = document.getElementById('ai-result');
   const loading = document.getElementById('ai-loading');
@@ -1330,38 +1329,21 @@ async function generateImage() {
   btn.textContent = '⏳ Generating...';
   document.getElementById('ai-prompt').value = '';
 
-  // Set a timeout fallback
-  const timeout = setTimeout(() => {
-    imgEl.onload = null;
-    imgEl.onerror = null;
-    loading.style.display = 'none';
-    errorDiv.style.display = 'block';
-    errorDiv.textContent = '⚠️ Timed out — try again';
-    btn.disabled = false;
-    btn.textContent = '✨ Generate Image';
-  }, 45000);
-
-  imgEl.onload = () => {
-    clearTimeout(timeout);
+  try {
+    const imageElement = await puter.ai.txt2img(fullPrompt);
+    const imageUrl = imageElement.src;
     currentAiImageUrl = imageUrl;
+    imgEl.src = imageUrl;
     loading.style.display = 'none';
     imageWrap.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = '✨ Generate Image';
-  };
-
-  imgEl.onerror = () => {
-    clearTimeout(timeout);
+  } catch (err) {
     loading.style.display = 'none';
     errorDiv.style.display = 'block';
-    errorDiv.textContent = '⚠️ Image failed to load — try again or try a different prompt';
+    errorDiv.textContent = `⚠️ ${err.message || 'Generation failed — try again'}`;
+  } finally {
     btn.disabled = false;
     btn.textContent = '✨ Generate Image';
-  };
-
-  // Set src directly — browser handles the load
-  imgEl.src = imageUrl;
-  currentAiImageUrl = imageUrl;
+  }
 }
 
 function sendToMemeCreator() {
