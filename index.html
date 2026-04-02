@@ -1351,6 +1351,20 @@ const PRESET_SOUNDS = [
 const soundCache = {};
 let currentAudio = null;
 
+// Synth fallbacks for when Freesound fails
+const synthFallbacks = {
+  airhorn:  () => { const a=audioCtx,o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sawtooth';const t=a.currentTime;[880,1100,1320].forEach((f,i)=>{o.frequency.setValueAtTime(f,t+i*0.01)});g.gain.setValueAtTime(0.4,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.8);o.start(t);o.stop(t+0.8); },
+  foghorn:  () => { const a=audioCtx,o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sine';const t=a.currentTime;o.frequency.setValueAtTime(110,t);o.frequency.linearRampToValueAtTime(80,t+1.5);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.5,t+0.1);g.gain.setValueAtTime(0.5,t+1.2);g.gain.linearRampToValueAtTime(0,t+1.5);o.start(t);o.stop(t+1.5); },
+  klaxon:   () => { const a=audioCtx,o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sawtooth';const t=a.currentTime;[880,440,880,440].forEach((f,i)=>o.frequency.setValueAtTime(f,t+i*0.25));g.gain.setValueAtTime(0.4,t);g.gain.exponentialRampToValueAtTime(0.001,t+1);o.start(t);o.stop(t+1); },
+  sadtrom:  () => { const a=audioCtx,o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sawtooth';const t=a.currentTime;[466,415,370,311].forEach((f,i)=>o.frequency.setValueAtTime(f,t+i*0.18));g.gain.setValueAtTime(0.3,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.9);o.start(t);o.stop(t+0.9); },
+  applause: () => { const a=audioCtx;for(let i=0;i<60;i++){const o=a.createOscillator(),g=a.createGain(),f=a.createBiquadFilter();o.connect(f);f.connect(g);g.connect(a.destination);o.type='sawtooth';f.type='bandpass';f.frequency.value=800+Math.random()*2000;const t=a.currentTime+Math.random()*2;o.frequency.value=100+Math.random()*3000;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.015,t+0.01);g.gain.exponentialRampToValueAtTime(0.001,t+0.07);o.start(t);o.stop(t+0.07);} },
+  drumroll: () => { const a=audioCtx;for(let i=0;i<24;i++){const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='triangle';const t=a.currentTime+i*0.05;o.frequency.value=120+Math.random()*40;g.gain.setValueAtTime(0.15+i*0.008,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.04);o.start(t);o.stop(t+0.04);} },
+  dogbark:  () => { const a=audioCtx;[0,0.4,0.8].forEach(d=>{const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sawtooth';const t=a.currentTime+d;o.frequency.setValueAtTime(300,t);o.frequency.exponentialRampToValueAtTime(150,t+0.15);g.gain.setValueAtTime(0.35,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.18);o.start(t);o.stop(t+0.18);}); },
+  laser:    () => { const a=audioCtx,o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sine';const t=a.currentTime;o.frequency.setValueAtTime(1800,t);o.frequency.exponentialRampToValueAtTime(200,t+0.3);g.gain.setValueAtTime(0.4,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.3);o.start(t);o.stop(t+0.3); },
+  fail:     () => { const a=audioCtx,o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='square';const t=a.currentTime;[400,350,300,200].forEach((f,i)=>o.frequency.setValueAtTime(f,t+i*0.1));g.gain.setValueAtTime(0.3,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.5);o.start(t);o.stop(t+0.5); },
+  tada:     () => { const a=audioCtx;[[523,0],[659,0.1],[784,0.2],[1047,0.3]].forEach(([f,d])=>{const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='triangle';const t=a.currentTime+d;o.frequency.value=f;g.gain.setValueAtTime(0.3,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.25);o.start(t);o.stop(t+0.25);}); },
+};
+
 async function fetchAndPlayPreset(sound, btn) {
   if (audioCtx.state === 'suspended') audioCtx.resume();
 
@@ -1360,28 +1374,35 @@ async function fetchAndPlayPreset(sound, btn) {
     return;
   }
 
-  // Show loading state
+  // Show loading
+  const hintEl = btn.querySelector('.sound-rec-hint');
+  if (hintEl) hintEl.textContent = '⏳ loading...';
   btn.classList.add('playing');
-  const origHTML = btn.innerHTML;
-  btn.innerHTML = `<span class="sound-emoji">⏳</span><span class="sound-label">${sound.label}</span>`;
 
   try {
     const res = await fetch(
-      `https://freesound.org/apiv2/search/text/?query=${encodeURIComponent(sound.query)}&fields=id,previews&page_size=5&token=${FREESOUND_KEY}`
+      `https://freesound.org/apiv2/search/text/?query=${encodeURIComponent(sound.query)}&fields=id,previews&page_size=5&filter=duration:[0.5+TO+8]&token=${FREESOUND_KEY}`
     );
+    if (!res.ok) throw new Error('API error');
     const data = await res.json();
     if (!data.results || data.results.length === 0) throw new Error('No results');
 
-    // Pick a random result from top 5 for variety
     const pick = data.results[Math.floor(Math.random() * data.results.length)];
     const url = pick.previews['preview-hq-mp3'] || pick.previews['preview-lq-mp3'];
     soundCache[sound.id] = url;
-    btn.innerHTML = origHTML;
+    if (hintEl) hintEl.textContent = 'Hold to shuffle';
     playAudioUrl(url, btn);
   } catch (err) {
-    btn.innerHTML = origHTML;
+    // Fall back to synth
     btn.classList.remove('playing');
-    showToast('Could not load sound — try again', true);
+    if (hintEl) hintEl.textContent = 'Hold to shuffle';
+    if (synthFallbacks[sound.id]) {
+      btn.classList.add('playing');
+      setTimeout(() => btn.classList.remove('playing'), 800);
+      synthFallbacks[sound.id]();
+    } else {
+      showToast('Could not load sound', true);
+    }
   }
 }
 
@@ -1443,15 +1464,35 @@ function buildSoundboard() {
     const btn = document.createElement('button');
     btn.className = 'sound-btn';
     btn.dataset.id = s.id;
-    btn.innerHTML = `<span class="sound-emoji">${s.emoji}</span><span class="sound-label">${s.label}</span><span class="sound-rec-hint">🔀 tap again to shuffle</span>`;
-    btn.addEventListener('click', () => {
-      // If shift held, do nothing (no delete on presets)
-      if (btn.classList.contains('playing')) {
-        // Second tap = shuffle (clear cache for this sound)
+    btn.innerHTML = `<span class="sound-emoji">${s.emoji}</span><span class="sound-label">${s.label}</span><span class="sound-rec-hint">Hold to shuffle</span>`;
+
+    let holdTimer = null;
+    let didHold = false;
+
+    const onDown = () => {
+      didHold = false;
+      holdTimer = setTimeout(() => {
+        didHold = true;
         delete soundCache[s.id];
-      }
-      fetchAndPlayPreset(s, btn);
-    });
+        btn.classList.add('playing');
+        const orig = btn.querySelector('.sound-rec-hint').textContent;
+        btn.querySelector('.sound-rec-hint').textContent = '🔀 shuffling...';
+        fetchAndPlayPreset(s, btn).then(() => {
+          if (btn.querySelector('.sound-rec-hint'))
+            btn.querySelector('.sound-rec-hint').textContent = 'Hold to shuffle';
+        });
+      }, 600);
+    };
+    const onUp = () => {
+      clearTimeout(holdTimer);
+      if (!didHold) fetchAndPlayPreset(s, btn);
+    };
+
+    btn.addEventListener('mousedown', onDown);
+    btn.addEventListener('mouseup', onUp);
+    btn.addEventListener('mouseleave', () => clearTimeout(holdTimer));
+    btn.addEventListener('touchstart', (e) => { e.preventDefault(); onDown(); }, { passive: false });
+    btn.addEventListener('touchend', (e) => { e.preventDefault(); onUp(); });
     grid.appendChild(btn);
   });
 
