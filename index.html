@@ -487,7 +487,25 @@
     50% { box-shadow: 0 0 0 6px rgba(232,86,58,0); }
   }
 
-  /* Custom sound label editor */
+  .sound-btn .sound-del {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(232,86,58,0.9);
+    border: none;
+    color: #fff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    z-index: 10;
+  }
+  .sound-btn.shift-held .sound-del { display: flex; }
   .sound-label-input {
     position: absolute;
     bottom: 4px;
@@ -1526,7 +1544,7 @@ function buildSoundboard() {
     btn.dataset.customSlot = i;
 
     if (sound) {
-      btn.innerHTML = `<span class="sound-emoji">🎙️</span><span class="sound-label">${escHtml(sound.label)}</span><span class="sound-rec-hint">Hold to re-record</span>`;
+      btn.innerHTML = `<span class="sound-emoji">🎙️</span><span class="sound-label">${escHtml(sound.label)}</span><span class="sound-rec-hint">Hold to re-record</span><button class="sound-del" onclick="deleteCustomSound(event,${i})">✕</button>`;
       btn.addEventListener('click', () => playCustomSound(i, btn));
     } else {
       btn.innerHTML = `<span class="sound-emoji">🎙️</span><span class="sound-label" style="color:var(--muted);">CUSTOM ${i+1}</span><span class="sound-rec-hint">Hold to record</span>`;
@@ -1615,12 +1633,27 @@ function showToast(msg, isError = false) {
   setTimeout(() => t.className = '', 3000);
 }
 
-// Secret delete — hold Shift to reveal delete buttons on thumbnails
+async function deleteCustomSound(e, slotIndex) {
+  e.stopPropagation();
+  if (!confirm('Delete this custom sound?')) return;
+  customSounds[slotIndex] = null;
+  await saveCustomSounds();
+  buildSoundboard();
+  showToast('Sound deleted');
+}
+
+// Secret delete — hold Shift to reveal delete buttons on sound slots
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Shift') document.querySelectorAll('.meme-thumb').forEach(t => t.classList.add('shift-held'));
+  if (e.key === 'Shift') {
+    document.querySelectorAll('.meme-thumb').forEach(t => t.classList.add('shift-held'));
+    document.querySelectorAll('.sound-btn.custom').forEach(t => t.classList.add('shift-held'));
+  }
 });
 document.addEventListener('keyup', (e) => {
-  if (e.key === 'Shift') document.querySelectorAll('.meme-thumb').forEach(t => t.classList.remove('shift-held'));
+  if (e.key === 'Shift') {
+    document.querySelectorAll('.meme-thumb').forEach(t => t.classList.remove('shift-held'));
+    document.querySelectorAll('.sound-btn.custom').forEach(t => t.classList.remove('shift-held'));
+  }
 });
 
 // ─────────────────────────────────────────────
