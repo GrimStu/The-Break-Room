@@ -1319,6 +1319,7 @@ async function generateImage() {
   const imageWrap = document.getElementById('ai-image-wrap');
   const errorDiv = document.getElementById('ai-error');
   const btn = document.getElementById('ai-generate-btn');
+  const imgEl = document.getElementById('ai-image');
 
   result.style.display = 'block';
   loading.style.display = 'block';
@@ -1327,35 +1328,43 @@ async function generateImage() {
   btn.disabled = true;
   btn.textContent = '⏳ Generating...';
 
-  try {
-    await new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        currentAiImageUrl = imageUrl;
-        document.getElementById('ai-image').src = imageUrl;
-        loading.style.display = 'none';
-        imageWrap.style.display = 'block';
-        resolve();
-      };
-      img.onerror = () => reject(new Error('Image failed to load — try again'));
-      img.src = imageUrl;
-      setTimeout(() => reject(new Error('Timed out — try again')), 40000);
-    });
-  } catch (err) {
+  // Set a timeout fallback
+  const timeout = setTimeout(() => {
+    imgEl.onload = null;
+    imgEl.onerror = null;
     loading.style.display = 'none';
     errorDiv.style.display = 'block';
-    errorDiv.textContent = `⚠️ ${err.message}`;
-  } finally {
+    errorDiv.textContent = '⚠️ Timed out — try again';
     btn.disabled = false;
     btn.textContent = '✨ Generate Image';
-  }
+  }, 45000);
+
+  imgEl.onload = () => {
+    clearTimeout(timeout);
+    currentAiImageUrl = imageUrl;
+    loading.style.display = 'none';
+    imageWrap.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = '✨ Generate Image';
+  };
+
+  imgEl.onerror = () => {
+    clearTimeout(timeout);
+    loading.style.display = 'none';
+    errorDiv.style.display = 'block';
+    errorDiv.textContent = '⚠️ Image failed to load — try again or try a different prompt';
+    btn.disabled = false;
+    btn.textContent = '✨ Generate Image';
+  };
+
+  // Set src directly — browser handles the load
+  imgEl.src = imageUrl;
+  currentAiImageUrl = imageUrl;
 }
 
 function sendToMemeCreator() {
   if (!currentAiImageUrl) return;
   const img = new Image();
-  img.crossOrigin = 'anonymous';
   img.onload = () => {
     selectedImage = img;
     document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
@@ -1368,7 +1377,9 @@ function sendToMemeCreator() {
     drawMeme();
     showToast('Image sent to Meme Creator! 🎨');
   };
-  img.src = currentAiImageUrl;
+  img.onerror = () => showToast('Could not send to Meme Creator — try downloading and uploading instead.', true);
+  img.crossOrigin = 'anonymous';
+  img.src = currentAiImageUrl + '&t=' + Date.now();
 }
 
 function downloadAiImage() {
