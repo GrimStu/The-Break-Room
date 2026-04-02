@@ -1330,156 +1330,73 @@ async function deleteMeme(e, index) {
 // ─────────────────────────────────────────────
 // SOUNDBOARD
 // ─────────────────────────────────────────────
+const FREESOUND_KEY = 'QCrFa6vFre2pVoYtJ1hsyutB53F6IMiwTOs4MeLq';
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// 10 preset sounds + 5 custom + 10 blank
+// 10 preset sounds with Freesound search terms
 const PRESET_SOUNDS = [
-  { id: 'klaxon',    emoji: '🚨', label: 'KLAXON',     type: 'synth', fn: playKlaxon },
-  { id: 'foghorn',   emoji: '🚢', label: 'FOGHORN',    type: 'synth', fn: playFoghorn },
-  { id: 'airhorn',   emoji: '📣', label: 'AIR HORN',   type: 'synth', fn: playAirhorn },
-  { id: 'sadtrom',   emoji: '🎺', label: 'SAD TROMBONE',type: 'synth', fn: playSadTrombone },
-  { id: 'alarm',     emoji: '⏰', label: 'ALARM',      type: 'synth', fn: playAlarm },
-  { id: 'applause',  emoji: '👏', label: 'APPLAUSE',   type: 'synth', fn: playApplause },
-  { id: 'drumroll',  emoji: '🥁', label: 'DRUM ROLL',  type: 'synth', fn: playDrumroll },
-  { id: 'laser',     emoji: '⚡', label: 'LASER',      type: 'synth', fn: playLaser },
-  { id: 'boing',     emoji: '🎈', label: 'BOING',      type: 'synth', fn: playBoing },
-  { id: 'tada',      emoji: '🎉', label: 'TA-DA!',     type: 'synth', fn: playTada },
+  { id: 'airhorn',   emoji: '📣', label: 'AIR HORN',    query: 'air horn stadium' },
+  { id: 'foghorn',   emoji: '🚢', label: 'FOGHORN',     query: 'foghorn ship' },
+  { id: 'klaxon',    emoji: '🚨', label: 'KLAXON',      query: 'klaxon alarm' },
+  { id: 'sadtrom',   emoji: '🎺', label: 'SAD TROMBONE',query: 'sad trombone wah wah' },
+  { id: 'applause',  emoji: '👏', label: 'APPLAUSE',    query: 'crowd applause cheering' },
+  { id: 'drumroll',  emoji: '🥁', label: 'DRUM ROLL',   query: 'snare drum roll' },
+  { id: 'dogbark',   emoji: '🐶', label: 'DOG BARK',    query: 'dog barking' },
+  { id: 'laser',     emoji: '⚡', label: 'LASER',       query: 'laser sci-fi zap' },
+  { id: 'fail',      emoji: '❌', label: 'FAIL',        query: 'game fail wrong buzzer' },
+  { id: 'tada',      emoji: '🎉', label: 'TA-DA!',      query: 'fanfare victory ta da' },
 ];
 
-// Synth sound functions
-function playKlaxon() {
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.connect(g); g.connect(audioCtx.destination);
-  o.type = 'sawtooth';
-  const t = audioCtx.currentTime;
-  o.frequency.setValueAtTime(880, t);
-  o.frequency.setValueAtTime(440, t + 0.25);
-  o.frequency.setValueAtTime(880, t + 0.5);
-  o.frequency.setValueAtTime(440, t + 0.75);
-  g.gain.setValueAtTime(0.4, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
-  o.start(t); o.stop(t + 1.0);
-}
-function playFoghorn() {
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.connect(g); g.connect(audioCtx.destination);
-  o.type = 'sine';
-  const t = audioCtx.currentTime;
-  o.frequency.setValueAtTime(110, t);
-  o.frequency.linearRampToValueAtTime(80, t + 1.5);
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(0.5, t + 0.1);
-  g.gain.setValueAtTime(0.5, t + 1.2);
-  g.gain.linearRampToValueAtTime(0, t + 1.5);
-  o.start(t); o.stop(t + 1.5);
-}
-function playAirhorn() {
-  [880, 1100, 1320].forEach((freq, i) => {
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    o.type = 'sawtooth';
-    const t = audioCtx.currentTime + i * 0.01;
-    o.frequency.setValueAtTime(freq, t);
-    g.gain.setValueAtTime(0.2, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
-    o.start(t); o.stop(t + 0.8);
-  });
-}
-function playSadTrombone() {
-  const notes = [466, 415, 370, 311];
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.connect(g); g.connect(audioCtx.destination);
-  o.type = 'sawtooth';
-  const t = audioCtx.currentTime;
-  notes.forEach((freq, i) => o.frequency.setValueAtTime(freq, t + i * 0.18));
-  g.gain.setValueAtTime(0.3, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
-  o.start(t); o.stop(t + 0.9);
-}
-function playAlarm() {
-  for (let i = 0; i < 6; i++) {
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    o.type = 'square';
-    const t = audioCtx.currentTime + i * 0.15;
-    o.frequency.setValueAtTime(i % 2 === 0 ? 1200 : 800, t);
-    g.gain.setValueAtTime(0.15, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-    o.start(t); o.stop(t + 0.12);
+// Cache loaded sound URLs so we don't re-fetch
+const soundCache = {};
+let currentAudio = null;
+
+async function fetchAndPlayPreset(sound, btn) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  // If cached, play directly
+  if (soundCache[sound.id]) {
+    playAudioUrl(soundCache[sound.id], btn);
+    return;
+  }
+
+  // Show loading state
+  btn.classList.add('playing');
+  const origHTML = btn.innerHTML;
+  btn.innerHTML = `<span class="sound-emoji">⏳</span><span class="sound-label">${sound.label}</span>`;
+
+  try {
+    const res = await fetch(
+      `https://freesound.org/apiv2/search/text/?query=${encodeURIComponent(sound.query)}&fields=id,previews&page_size=5&token=${FREESOUND_KEY}`
+    );
+    const data = await res.json();
+    if (!data.results || data.results.length === 0) throw new Error('No results');
+
+    // Pick a random result from top 5 for variety
+    const pick = data.results[Math.floor(Math.random() * data.results.length)];
+    const url = pick.previews['preview-hq-mp3'] || pick.previews['preview-lq-mp3'];
+    soundCache[sound.id] = url;
+    btn.innerHTML = origHTML;
+    playAudioUrl(url, btn);
+  } catch (err) {
+    btn.innerHTML = origHTML;
+    btn.classList.remove('playing');
+    showToast('Could not load sound — try again', true);
   }
 }
-function playApplause() {
-  for (let i = 0; i < 80; i++) {
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    const f = audioCtx.createBiquadFilter();
-    o.connect(f); f.connect(g); g.connect(audioCtx.destination);
-    o.type = 'sawtooth';
-    f.type = 'bandpass';
-    f.frequency.value = 800 + Math.random() * 2000;
-    const t = audioCtx.currentTime + Math.random() * 2.5;
-    o.frequency.value = 100 + Math.random() * 3000;
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.02, t + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-    o.start(t); o.stop(t + 0.08);
-  }
-}
-function playDrumroll() {
-  for (let i = 0; i < 24; i++) {
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    o.type = 'triangle';
-    const t = audioCtx.currentTime + i * 0.05;
-    o.frequency.value = 120 + Math.random() * 40;
-    g.gain.setValueAtTime(0.15 + i * 0.008, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-    o.start(t); o.stop(t + 0.04);
-  }
-}
-function playLaser() {
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.connect(g); g.connect(audioCtx.destination);
-  o.type = 'sine';
-  const t = audioCtx.currentTime;
-  o.frequency.setValueAtTime(1800, t);
-  o.frequency.exponentialRampToValueAtTime(200, t + 0.3);
-  g.gain.setValueAtTime(0.4, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
-  o.start(t); o.stop(t + 0.3);
-}
-function playBoing() {
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.connect(g); g.connect(audioCtx.destination);
-  o.type = 'sine';
-  const t = audioCtx.currentTime;
-  o.frequency.setValueAtTime(200, t);
-  o.frequency.exponentialRampToValueAtTime(600, t + 0.1);
-  o.frequency.exponentialRampToValueAtTime(300, t + 0.4);
-  g.gain.setValueAtTime(0.4, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
-  o.start(t); o.stop(t + 0.5);
-}
-function playTada() {
-  [[523,0],[659,0.1],[784,0.2],[1047,0.3]].forEach(([freq, delay]) => {
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    o.type = 'triangle';
-    const t = audioCtx.currentTime + delay;
-    o.frequency.value = freq;
-    g.gain.setValueAtTime(0.3, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
-    o.start(t); o.stop(t + 0.25);
-  });
+
+function playAudioUrl(url, btn) {
+  // Stop any currently playing sound
+  if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+  const audio = new Audio(url);
+  currentAudio = audio;
+  btn.classList.add('playing');
+  audio.play();
+  audio.onended = () => btn.classList.remove('playing');
+  audio.onerror = () => {
+    btn.classList.remove('playing');
+    showToast('Playback failed — try again', true);
+  };
 }
 
 // Custom sound state
@@ -1526,12 +1443,14 @@ function buildSoundboard() {
     const btn = document.createElement('button');
     btn.className = 'sound-btn';
     btn.dataset.id = s.id;
-    btn.innerHTML = `<span class="sound-emoji">${s.emoji}</span><span class="sound-label">${s.label}</span>`;
+    btn.innerHTML = `<span class="sound-emoji">${s.emoji}</span><span class="sound-label">${s.label}</span><span class="sound-rec-hint">🔀 tap again to shuffle</span>`;
     btn.addEventListener('click', () => {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      btn.classList.add('playing');
-      setTimeout(() => btn.classList.remove('playing'), 600);
-      s.fn();
+      // If shift held, do nothing (no delete on presets)
+      if (btn.classList.contains('playing')) {
+        // Second tap = shuffle (clear cache for this sound)
+        delete soundCache[s.id];
+      }
+      fetchAndPlayPreset(s, btn);
     });
     grid.appendChild(btn);
   });
