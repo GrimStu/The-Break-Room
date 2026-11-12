@@ -561,6 +561,54 @@
   }
   .modal-input:focus { border-color: var(--accent); }
   .modal-btn-row { display: flex; gap: 10px; justify-content: center; }
+
+  /* ── Live Quiz ── */
+  .quiz-wrap { max-width: 720px; margin: 0 auto; }
+  .quiz-center { text-align: center; }
+  .quiz-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; text-align: left; }
+  .quiz-field label { font-size: 0.78rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .quiz-input, .quiz-select {
+    width: 100%; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.95rem; outline: none;
+  }
+  .quiz-input:focus, .quiz-select:focus { border-color: var(--accent); }
+  .quiz-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .quiz-row > * { flex: 1 1 140px; }
+  .quiz-btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+  .quiz-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; }
+  .quiz-code { font-size: 3rem; font-weight: 800; letter-spacing: 10px; color: var(--accent); margin: 4px 0 2px; padding-left: 10px; }
+  .quiz-players { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 16px 0; }
+  .quiz-chip { padding: 6px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; font-size: 0.85rem; }
+  .quiz-chip.off { opacity: 0.45; }
+  .quiz-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.82rem; font-weight: 700; }
+  .quiz-timer { height: 8px; background: var(--surface2); border-radius: 6px; overflow: hidden; margin: 8px 0 4px; }
+  .quiz-timer-bar { height: 100%; width: 100%; background: var(--accent3); transition: width 0.2s linear; }
+  .quiz-timer-bar.low { background: var(--accent2); }
+  .quiz-q { font-size: 1.25rem; font-weight: 700; line-height: 1.4; margin: 16px 0 18px; text-align: center; }
+  .quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quiz-opt {
+    padding: 14px; text-align: left; background: var(--surface2); border: 2px solid var(--border);
+    border-radius: 10px; color: var(--text); font-family: inherit; font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-opt.picked { border-color: var(--accent); background: rgba(245, 200, 66, 0.12); }
+  .quiz-opt.correct { border-color: #3ecf6e; background: rgba(62, 207, 110, 0.16); }
+  .quiz-opt.wrong { border-color: var(--accent2); background: rgba(232, 86, 58, 0.14); }
+  .quiz-result { text-align: center; font-weight: 800; font-size: 1.1rem; margin: 6px 0 14px; }
+  .quiz-board { margin-top: 14px; }
+  .quiz-board-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; background: var(--surface2); border: 1px solid transparent; margin-bottom: 6px; font-size: 0.92rem; }
+  .quiz-board-row.me { border-color: var(--accent); }
+  .quiz-rank { width: 30px; font-weight: 800; color: var(--accent); }
+  .quiz-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .quiz-score { font-weight: 800; }
+  .quiz-gain { color: #3ecf6e; font-weight: 700; font-size: 0.8rem; margin-left: 8px; }
+  .quiz-banner { padding: 10px 14px; border-radius: 8px; background: rgba(232, 86, 58, 0.14); border: 1px solid var(--accent2); font-size: 0.85rem; margin: 10px 0; text-align: center; }
+  @media (max-width: 600px) {
+    .quiz-opts { grid-template-columns: 1fr; }
+    .quiz-code { font-size: 2.4rem; letter-spacing: 6px; }
+  }
 </style>
 </head>
 <body>
@@ -574,6 +622,7 @@
   <button class="tab-btn" onclick="switchTab('memes', this)">🖼️ Meme Creator</button>
   <button class="tab-btn" onclick="switchTab('hall', this)">🏆 Hall of Memes</button>
   <button class="tab-btn" onclick="switchTab('sounds', this)">🔊 Soundboard</button>
+  <button class="tab-btn" onclick="switchTab('quiz', this)">🎄 Quiz</button>
 </div>
 
 <main>
@@ -734,6 +783,13 @@
     </div>
   </div>
 
+  <!-- ── LIVE QUIZ ── -->
+  <div id="panel-quiz" class="panel">
+    <div class="quiz-wrap">
+      <div class="card" id="quiz-root"></div>
+    </div>
+  </div>
+
 </main>
 
 <!-- ── Share Modal ── -->
@@ -773,6 +829,7 @@ function switchTab(name, btn) {
   btn.classList.add('active');
   if (name === 'hall') loadHall();
   if (name === 'sounds') loadCustomSounds();
+  if (name === 'quiz' && window.Quiz) window.Quiz.open();
 }
 
 // ─────────────────────────────────────────────
@@ -1641,5 +1698,614 @@ initCanvasDrag();
 buildSwatches();
 setJokePrompt();
 </script>
+
+<!-- ── Live Quiz (Firebase Realtime Database) ── -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script>
+(function () {
+'use strict';
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCrqeyETcZ0GfSFiBttWUSzGemjj6N3wo4",
+  authDomain: "the-break-room-quiz.firebaseapp.com",
+  databaseURL: "https://the-break-room-quiz-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "the-break-room-quiz",
+  storageBucket: "the-break-room-quiz.firebasestorage.app",
+  messagingSenderId: "281340957542",
+  appId: "1:281340957542:web:a7249f516408983fd9aea7"
+};
+
+// ─────────────────────────────────────────────
+// QUESTION BANK (Xmas). a = correct answer, w = three wrong answers
+// ─────────────────────────────────────────────
+const XMAS_BANK = [
+  { q: 'Which country is credited with starting the modern Christmas tree tradition?', a: 'Germany', w: ['Sweden', 'Canada', 'Spain'] },
+  { q: 'In The Twelve Days of Christmas, how many lords are leaping?', a: 'Ten', w: ['Nine', 'Eleven', 'Twelve'] },
+  { q: 'What is the name of Scrooge\'s late business partner in A Christmas Carol?', a: 'Jacob Marley', w: ['Bob Cratchit', 'Fezziwig', 'Tiny Tim'] },
+  { q: 'Who wrote A Christmas Carol?', a: 'Charles Dickens', w: ['Jane Austen', 'Thomas Hardy', 'Lewis Carroll'] },
+  { q: 'In which film does Kevin McCallister defend his house from burglars?', a: 'Home Alone', w: ['Elf', 'Jingle All the Way', 'The Santa Clause'] },
+  { q: 'Who plays Buddy in the film Elf?', a: 'Will Ferrell', w: ['Jim Carrey', 'Adam Sandler', 'Steve Carell'] },
+  { q: 'In the film Love Actually, which actor plays the Prime Minister?', a: 'Hugh Grant', w: ['Colin Firth', 'Bill Nighy', 'Liam Neeson'] },
+  { q: 'Which actor played Scrooge in The Muppet Christmas Carol?', a: 'Michael Caine', w: ['Patrick Stewart', 'Alec Guinness', 'Bill Murray'] },
+  { q: 'In Die Hard, whose Christmas party is the action set around?', a: 'Nakatomi Corporation', w: ['Wayne Enterprises', 'Cyberdyne Systems', 'Stark Industries'] },
+  { q: 'What is the name of the Grinch\'s dog?', a: 'Max', w: ['Rex', 'Buddy', 'Scruffy'] },
+  { q: 'In which year was the first commercial Christmas card produced?', a: '1843', w: ['1793', '1893', '1923'] },
+  { q: 'Who gave the first royal Christmas broadcast on radio in 1932?', a: 'King George V', w: ['Queen Victoria', 'King Edward VIII', 'Queen Elizabeth II'] },
+  { q: 'Which country gives the UK the giant Christmas tree in Trafalgar Square each year?', a: 'Norway', w: ['Sweden', 'Germany', 'Canada'] },
+  { q: 'Which is the best-selling Christmas single of all time, worldwide?', a: 'White Christmas by Bing Crosby', w: ['Last Christmas by Wham!', 'Mistletoe and Wine by Cliff Richard', 'Do They Know It\'s Christmas? by Band Aid'] },
+  { q: 'Which charity supergroup released Do They Know It\'s Christmas? in 1984?', a: 'Band Aid', w: ['Live Aid', 'Comic Relief', 'Children in Need'] },
+  { q: 'Who released the song Last Christmas in 1984?', a: 'Wham!', w: ['Spandau Ballet', 'Culture Club', 'Duran Duran'] },
+  { q: 'Which singer duets with Shane MacGowan on Fairytale of New York?', a: 'Kirsty MacColl', w: ['Sinead O\'Connor', 'Dolores O\'Riordan', 'Alison Moyet'] },
+  { q: 'Which band released Merry Xmas Everybody in 1973?', a: 'Slade', w: ['Wizzard', 'The Sweet', 'Mud'] },
+  { q: 'Which Mariah Carey song returns to the charts every December?', a: 'All I Want for Christmas Is You', w: ['Hero', 'Fantasy', 'Vision of Love'] },
+  { q: 'What is traditionally set alight on top of a Christmas pudding?', a: 'Brandy', w: ['Gin', 'Vodka', 'Sherry'] },
+  { q: 'Brussels sprouts are a type of which vegetable?', a: 'Cabbage', w: ['Lettuce', 'Spinach', 'Pea'] },
+  { q: 'What date is Boxing Day?', a: '26 December', w: ['24 December', '25 December', '27 December'] },
+  { q: 'Which saint is Santa Claus based on?', a: 'Saint Nicholas', w: ['Saint George', 'Saint David', 'Saint Patrick'] },
+  { q: 'What does Nadolig Llawen mean in Welsh?', a: 'Merry Christmas', w: ['Happy New Year', 'Happy Birthday', 'Good Morning'] },
+  { q: 'Which Welsh Christmas and New Year tradition features a decorated horse skull?', a: 'Mari Lwyd', w: ['Plygain', 'Calennig', 'Cwtch'] },
+  { q: 'In total, how many gifts are given across all twelve days in The Twelve Days of Christmas?', a: '364', w: ['78', '144', '156'] },
+  { q: 'Which plant do people traditionally kiss under at Christmas?', a: 'Mistletoe', w: ['Holly', 'Ivy', 'Poinsettia'] },
+  { q: 'The poinsettia, a popular Christmas plant, originally comes from which country?', a: 'Mexico', w: ['Brazil', 'Egypt', 'India'] },
+  { q: 'Not counting Rudolph, how many reindeer pull Santa\'s sleigh in the traditional poem?', a: 'Eight', w: ['Six', 'Nine', 'Twelve'] },
+  { q: 'What do the French call Father Christmas?', a: 'Père Noël', w: ['Papa Natal', 'Babbo Natale', 'Weihnachtsmann'] },
+  { q: 'In which film does George Bailey live in Bedford Falls?', a: 'It\'s a Wonderful Life', w: ['Miracle on 34th Street', 'White Christmas', 'Holiday Inn'] },
+  { q: 'Which 1994 film starring Tim Allen sees an ordinary man take over from Santa?', a: 'The Santa Clause', w: ['Jingle All the Way', 'Fred Claus', 'Deck the Halls'] },
+  { q: 'What colour are the berries on a holly plant?', a: 'Red', w: ['White', 'Blue', 'Black'] },
+  { q: 'What does an Advent calendar count down to?', a: 'Christmas', w: ['New Year', 'Epiphany', 'Boxing Day'] },
+  { q: 'What does the Grinch try to steal?', a: 'Christmas', w: ['Easter', 'Halloween', 'Birthdays'] },
+  { q: 'Traditional mulled wine is made by gently heating which drink with spices?', a: 'Red wine', w: ['Whisky', 'Cider', 'Beer'] },
+  { q: 'Which reindeer is famous for having a shiny red nose?', a: 'Rudolph', w: ['Dasher', 'Blitzen', 'Comet'] },
+  { q: 'In Australia, Christmas falls in which season?', a: 'Summer', w: ['Winter', 'Autumn', 'Spring'] },
+  { q: 'Which royal helped popularise the Christmas tree in Victorian Britain?', a: 'Prince Albert', w: ['Edward VII', 'Prince Philip', 'Henry VIII'] }
+];
+
+const CATEGORIES = [
+  ['', 'Any category'], ['9', 'General Knowledge'], ['11', 'Film'], ['12', 'Music'], ['14', 'Television'],
+  ['15', 'Video Games'], ['17', 'Science and Nature'], ['18', 'Computers'], ['21', 'Sports'],
+  ['22', 'Geography'], ['23', 'History'], ['27', 'Animals']
+];
+
+// ─────────────────────────────────────────────
+// STATE + HELPERS
+// ─────────────────────────────────────────────
+const Q = {
+  ready: false, opened: false, db: null, offset: 0,
+  uid: null, name: '', code: null, isHost: false,
+  ref: null, listener: null, connRef: null, connCb: null,
+  room: null, lastKey: null, picked: null, revealed: -1,
+  secret: null, questions: null, tick: null
+};
+
+const $ = (id) => document.getElementById(id);
+const root = () => $('quiz-root');
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const toast = (m, err) => { if (typeof showToast === 'function') showToast(m, !!err); };
+const serverNow = () => Date.now() + Q.offset;
+const newId = () => 'p' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } }
+function ssGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+function ssSet(k, v) { try { if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) { /* ignore */ } }
+
+function makeQ(text, correct, wrongs) {
+  const options = shuffle([correct].concat(wrongs));
+  return { text: text, options: options, correct: options.indexOf(correct) };
+}
+function xmasQuestions(n) {
+  return shuffle(XMAS_BANK).slice(0, n).map((x) => makeQ(x.q, x.a, x.w));
+}
+const dec = (s) => { try { return decodeURIComponent(s); } catch (e) { return s; } };
+
+async function fetchGeneral(n, cat, diff) {
+  let url = 'https://opentdb.com/api.php?amount=' + n + '&type=multiple&encode=url3986';
+  if (cat) url += '&category=' + cat;
+  if (diff) url += '&difficulty=' + diff;
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), 9000);
+  try {
+    const res = await fetch(url, { signal: ctl.signal });
+    const data = await res.json();
+    if (data.response_code !== 0 || !data.results || !data.results.length) throw new Error('no results');
+    return data.results.map((r) => makeQ(dec(r.question), dec(r.correct_answer), r.incorrect_answers.map(dec)));
+  } finally { clearTimeout(t); }
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+function init() {
+  if (Q.ready) return true;
+  if (typeof firebase === 'undefined') return false;
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    Q.db = firebase.database();
+    Q.db.ref('.info/serverTimeOffset').on('value', (s) => { Q.offset = s.val() || 0; });
+    Q.ready = true;
+    return true;
+  } catch (e) { console.error(e); return false; }
+}
+
+function open() {
+  if (Q.opened) return;
+  if (!init()) {
+    root().innerHTML = '<div class="quiz-center"><div class="card-title">🎄 Live Quiz</div>' +
+      '<p class="quiz-sub">The live quiz could not connect. It needs access to Google Firebase. ' +
+      'Try again from another network, or let whoever runs this page know.</p></div>';
+    return;
+  }
+  Q.opened = true;
+  tryResume().then((ok) => { if (!ok) renderMenu(); });
+}
+
+// ─────────────────────────────────────────────
+// MENU + HOST SETUP
+// ─────────────────────────────────────────────
+function renderMenu() {
+  const name = Q.name || lsGet('bq_name') || '';
+  root().innerHTML =
+    '<div class="card-title" style="text-align:center;">🎄 Live Quiz</div>' +
+    '<p class="quiz-sub quiz-center">Race your team to the right answers. Faster correct answers score more.</p>' +
+    '<div class="quiz-field"><label for="quiz-name">Your name</label>' +
+    '<input id="quiz-name" class="quiz-input" maxlength="20" placeholder="Enter your name" value="' + esc(name) + '"></div>' +
+    '<div class="quiz-field"><label for="quiz-code">Join a game with its room code</label>' +
+    '<input id="quiz-code" class="quiz-input" maxlength="4" placeholder="ABCD" style="text-transform:uppercase; letter-spacing:6px; text-align:center;"></div>' +
+    '<div class="quiz-btn-row">' +
+    '<button class="btn btn-hall" onclick="Quiz.join()">Join Game 🚪</button>' +
+    '<button class="btn btn-primary" onclick="Quiz.hostSetup()">Host a Game 🎤</button>' +
+    '</div>';
+}
+
+function readName() {
+  const el = $('quiz-name');
+  const n = ((el && el.value) || Q.name || '').trim().slice(0, 20);
+  if (!n) { toast('Enter your name first', true); return null; }
+  Q.name = n;
+  lsSet('bq_name', n);
+  return n;
+}
+
+function numOpts(from, to, sel) {
+  let h = '';
+  for (let i = from; i <= to; i++) h += '<option value="' + i + '"' + (i === sel ? ' selected' : '') + '>' + i + '</option>';
+  return h;
+}
+
+function hostSetup() {
+  if (!readName()) return;
+  root().innerHTML =
+    '<div class="card-title" style="text-align:center;">🎤 Host a Game</div>' +
+    '<div class="quiz-row">' +
+    '<div class="quiz-field"><label for="quiz-nx">Xmas questions</label><select id="quiz-nx" class="quiz-select">' + numOpts(0, 20, 8) + '</select></div>' +
+    '<div class="quiz-field"><label for="quiz-ng">General questions</label><select id="quiz-ng" class="quiz-select">' + numOpts(0, 20, 7) + '</select></div>' +
+    '</div>' +
+    '<div class="quiz-row">' +
+    '<div class="quiz-field"><label for="quiz-cat">General category</label><select id="quiz-cat" class="quiz-select">' +
+    CATEGORIES.map((c) => '<option value="' + c[0] + '">' + esc(c[1]) + '</option>').join('') + '</select></div>' +
+    '<div class="quiz-field"><label for="quiz-diff">Difficulty</label><select id="quiz-diff" class="quiz-select">' +
+    '<option value="">Any</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></div>' +
+    '</div>' +
+    '<div class="quiz-field"><label for="quiz-secs">Seconds per question</label><select id="quiz-secs" class="quiz-select">' +
+    '<option value="10">10</option><option value="15" selected>15</option><option value="20">20</option><option value="30">30</option></select></div>' +
+    '<p class="quiz-sub quiz-center">You play too. Keep this tab open while hosting: if you refresh, the game ends.</p>' +
+    '<div class="quiz-btn-row">' +
+    '<button class="btn btn-primary" id="quiz-create" onclick="Quiz.create()">Create Room 🎄</button>' +
+    '<button class="btn btn-secondary" onclick="Quiz.menu()">Back</button>' +
+    '</div>';
+}
+
+// Consonants only, so a random code never spells a word
+const CODE_LETTERS = 'BCDFGHJKLMNPQRSTVWXZ';
+async function freeCode() {
+  for (let k = 0; k < 8; k++) {
+    let c = '';
+    for (let i = 0; i < 4; i++) c += CODE_LETTERS[Math.floor(Math.random() * CODE_LETTERS.length)];
+    const s = await Q.db.ref('rooms/' + c).get();
+    if (!s.exists()) return c;
+  }
+  throw new Error('Could not find a free room code');
+}
+
+async function cleanupOld() {
+  try {
+    const cutoff = serverNow() - 24 * 3600 * 1000;
+    const snap = await Q.db.ref('rooms').orderByChild('created').endAt(cutoff).limitToFirst(20).get();
+    snap.forEach((ch) => { ch.ref.remove(); });
+  } catch (e) { /* ignore */ }
+}
+
+async function create() {
+  const btn = $('quiz-create');
+  let nx = parseInt($('quiz-nx').value, 10) || 0;
+  let ng = parseInt($('quiz-ng').value, 10) || 0;
+  const cat = $('quiz-cat').value;
+  const diff = $('quiz-diff').value;
+  const secs = parseInt($('quiz-secs').value, 10) || 15;
+  if (nx + ng < 1) { toast('Pick at least one question', true); return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Setting up...'; }
+  try {
+    let general = [];
+    if (ng > 0) {
+      try { general = await fetchGeneral(ng, cat, diff); }
+      catch (e) {
+        toast('General questions could not load, using Xmas questions instead', true);
+        nx = Math.min(XMAS_BANK.length, nx + ng);
+        general = [];
+      }
+    }
+    const all = shuffle(xmasQuestions(nx).concat(general));
+    if (!all.length) throw new Error('No questions available');
+    cleanupOld();
+    const code = await freeCode();
+    Q.uid = newId();
+    Q.secret = all.map((q) => q.correct);
+    Q.questions = all.map((q) => ({ text: q.text, options: q.options }));
+    Q.revealed = -1;
+    const players = {};
+    players[Q.uid] = { name: Q.name, score: 0, last: 0, connected: true };
+    await Q.db.ref('rooms/' + code).set({
+      created: firebase.database.ServerValue.TIMESTAMP,
+      host: Q.uid, status: 'lobby', qIndex: -1,
+      total: all.length, duration: secs, players: players
+    });
+    enterRoom(code, true);
+  } catch (e) {
+    console.error(e);
+    toast('Could not create the room: ' + e.message, true);
+    hostSetup();
+  }
+}
+
+async function join() {
+  if (!readName()) return;
+  const code = (($('quiz-code').value) || '').trim().toUpperCase();
+  if (!/^[A-Z]{4}$/.test(code)) { toast('Enter the 4 letter room code', true); return; }
+  try {
+    const snap = await Q.db.ref('rooms/' + code).get();
+    if (!snap.exists()) { toast('No game found with that code', true); return; }
+    if (snap.val().status !== 'lobby') { toast('That game has already started', true); return; }
+    Q.uid = newId();
+    await Q.db.ref('rooms/' + code + '/players/' + Q.uid).set({ name: Q.name, score: 0, last: 0, connected: true });
+    enterRoom(code, false);
+  } catch (e) {
+    console.error(e);
+    toast('Could not join: ' + e.message, true);
+  }
+}
+
+async function tryResume() {
+  try {
+    const raw = ssGet('bq_session');
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    const snap = await Q.db.ref('rooms/' + s.code).get();
+    const r = snap.val();
+    if (!r || r.status === 'finished' || !r.players || !r.players[s.uid]) { ssSet('bq_session', null); return false; }
+    Q.uid = s.uid; Q.name = s.name || '';
+    enterRoom(s.code, false);
+    return true;
+  } catch (e) { return false; }
+}
+
+// ─────────────────────────────────────────────
+// ROOM LIFECYCLE
+// ─────────────────────────────────────────────
+function enterRoom(code, host) {
+  Q.code = code; Q.isHost = host; Q.lastKey = null; Q.picked = null; Q.room = null;
+  Q.ref = Q.db.ref('rooms/' + code);
+  if (!host) ssSet('bq_session', JSON.stringify({ code: code, uid: Q.uid, name: Q.name }));
+
+  Q.connRef = Q.db.ref('.info/connected');
+  Q.connCb = Q.connRef.on('value', (s) => {
+    if (s.val() !== true || !Q.code) return;
+    const pr = Q.ref.child('players/' + Q.uid);
+    pr.onDisconnect().update({ connected: false });
+    if (Q.room && Q.room.players && Q.room.players[Q.uid]) pr.update({ connected: true });
+  });
+
+  Q.listener = Q.ref.on('value', (snap) => {
+    const r = snap.val();
+    if (!r || !r.players || !r.players[Q.uid]) {
+      if (Q.code) toast(Q.isHost ? 'Room closed' : 'The host closed the room');
+      teardown();
+      renderMenu();
+      return;
+    }
+    Q.room = r;
+    if (r.players[Q.uid].connected === false) Q.ref.child('players/' + Q.uid + '/connected').set(true);
+    renderState();
+  });
+
+  if (Q.tick) clearInterval(Q.tick);
+  Q.tick = setInterval(tick, 200);
+}
+
+function teardown() {
+  try { if (Q.ref && Q.listener) Q.ref.off('value', Q.listener); } catch (e) { /* ignore */ }
+  try { if (Q.connRef && Q.connCb) Q.connRef.off('value', Q.connCb); } catch (e) { /* ignore */ }
+  try { if (Q.ref && Q.uid) Q.ref.child('players/' + Q.uid).onDisconnect().cancel(); } catch (e) { /* ignore */ }
+  if (Q.tick) clearInterval(Q.tick);
+  Q.tick = null; Q.listener = null; Q.connRef = null; Q.connCb = null;
+  Q.code = null; Q.room = null; Q.lastKey = null; Q.picked = null;
+  Q.secret = null; Q.questions = null; Q.isHost = false; Q.revealed = -1;
+  ssSet('bq_session', null);
+}
+
+function leave() {
+  const r = Q.room;
+  if (Q.isHost && r && r.status !== 'finished' && r.status !== 'lobby') {
+    if (!confirm('Leaving will end the game for everyone. Leave anyway?')) return;
+  }
+  const ref = Q.ref, host = Q.isHost, status = r && r.status, uid = Q.uid;
+  teardown();
+  try {
+    if (host) ref.remove();
+    else if (status === 'lobby') ref.child('players/' + uid).remove();
+    else if (status === 'question' || status === 'reveal') ref.child('players/' + uid + '/connected').set(false);
+  } catch (e) { /* ignore */ }
+  renderMenu();
+}
+
+// ─────────────────────────────────────────────
+// RENDERING
+// ─────────────────────────────────────────────
+function players() {
+  const p = (Q.room && Q.room.players) || {};
+  return Object.keys(p)
+    .filter((id) => p[id] && typeof p[id].name === 'string')
+    .map((id) => Object.assign({ id: id }, p[id]));
+}
+function ranked() {
+  return players().sort((a, b) => (b.score || 0) - (a.score || 0) || a.name.localeCompare(b.name));
+}
+
+function renderState() {
+  const r = Q.room;
+  const key = r.status + ':' + r.qIndex;
+  if (key !== Q.lastKey) {
+    Q.lastKey = key;
+    if (r.status === 'lobby') renderLobby();
+    else if (r.status === 'question') renderQuestion();
+    else if (r.status === 'reveal') renderReveal();
+    else if (r.status === 'finished') renderFinished();
+  } else {
+    if (r.status === 'lobby') updateLobby();
+    if (r.status === 'question') updateAnswered();
+  }
+  updateBanner();
+}
+
+function updateBanner() {
+  const el = $('quiz-banner');
+  if (!el || !Q.room || Q.isHost) return;
+  const h = Q.room.players && Q.room.players[Q.room.host];
+  el.style.display = (h && h.connected === false) ? '' : 'none';
+}
+const BANNER = '<div id="quiz-banner" class="quiz-banner" style="display:none;">The host has disconnected. Waiting for them to come back...</div>';
+
+function renderLobby() {
+  root().innerHTML =
+    '<div class="quiz-center">' +
+    '<div class="quiz-sub">Room code</div>' +
+    '<div class="quiz-code">' + esc(Q.code) + '</div>' +
+    '<div class="quiz-sub">Everyone opens the Quiz tab, enters this code and joins.</div>' +
+    BANNER +
+    '<div class="quiz-players" id="quiz-players"></div>' +
+    (Q.isHost
+      ? '<button class="btn btn-primary" id="quiz-start" onclick="Quiz.start()">Start Game 🚀</button>'
+      : '<div class="quiz-sub">Waiting for the host to start...</div>') +
+    '<div style="margin-top:14px;"><button class="btn btn-secondary" onclick="Quiz.leave()">Leave</button></div>' +
+    '</div>';
+  updateLobby();
+}
+
+function updateLobby() {
+  const el = $('quiz-players');
+  if (!el) return;
+  const ps = players();
+  el.innerHTML = ps.map((p) => '<span class="quiz-chip' + (p.connected === false ? ' off' : '') + '">' + esc(p.name) + '</span>').join('');
+  const b = $('quiz-start');
+  if (b) b.textContent = 'Start Game 🚀 (' + ps.length + (ps.length === 1 ? ' player)' : ' players)');
+}
+
+function renderQuestion() {
+  const r = Q.room;
+  const qn = r.question || { text: '', options: [] };
+  const mine = r.answers && r.answers[r.qIndex] && r.answers[r.qIndex][Q.uid];
+  Q.picked = mine ? mine.choice : null;
+  root().innerHTML =
+    '<div class="quiz-meta"><span>Question ' + (r.qIndex + 1) + ' of ' + r.total + '</span><span id="quiz-timer-num"></span></div>' +
+    '<div class="quiz-timer"><div class="quiz-timer-bar" id="quiz-timer-bar"></div></div>' +
+    BANNER +
+    '<div class="quiz-q">' + esc(qn.text) + '</div>' +
+    '<div class="quiz-opts">' +
+    (qn.options || []).map((o, i) => '<button class="quiz-opt" data-i="' + i + '" onclick="Quiz.pick(' + i + ')">' + esc(o) + '</button>').join('') +
+    '</div>' +
+    '<div class="quiz-sub quiz-center" id="quiz-answered" style="margin-top:14px;"></div>';
+  if (Q.picked !== null) markPicked(Q.picked);
+  updateAnswered();
+  tick();
+}
+
+function markPicked(i) {
+  document.querySelectorAll('#quiz-root .quiz-opt').forEach((b) => {
+    b.disabled = true;
+    if (parseInt(b.getAttribute('data-i'), 10) === i) b.classList.add('picked');
+  });
+}
+
+function updateAnswered() {
+  const el = $('quiz-answered');
+  if (!el || !Q.room) return;
+  const r = Q.room;
+  const ps = players().filter((p) => p.connected !== false);
+  const ans = (r.answers && r.answers[r.qIndex]) || {};
+  const n = ps.filter((p) => ans[p.id]).length;
+  el.textContent = (Q.picked !== null ? 'Locked in! ' : '') + n + ' of ' + ps.length + ' answered';
+}
+
+function pick(i) {
+  const r = Q.room;
+  if (!r || r.status !== 'question' || Q.picked !== null) return;
+  const left = r.duration * 1000 - (serverNow() - r.qStart);
+  if (left <= 0) { toast('Time is up', true); return; }
+  Q.picked = i;
+  markPicked(i);
+  updateAnswered();
+  Q.ref.child('answers/' + r.qIndex + '/' + Q.uid)
+    .set({ choice: i, ts: firebase.database.ServerValue.TIMESTAMP })
+    .catch((e) => toast('Your answer did not send: ' + e.message, true));
+}
+
+function boardHtml(list, showGain, limit) {
+  const rows = limit ? list.slice(0, limit) : list;
+  const medals = ['🥇', '🥈', '🥉'];
+  return '<div class="quiz-board">' + rows.map((p, i) =>
+    '<div class="quiz-board-row' + (p.id === Q.uid ? ' me' : '') + '">' +
+    '<span class="quiz-rank">' + (medals[i] || (i + 1)) + '</span>' +
+    '<span class="quiz-name">' + esc(p.name) + '</span>' +
+    '<span class="quiz-score">' + (p.score || 0) + '</span>' +
+    (showGain && p.last > 0 ? '<span class="quiz-gain">+' + p.last + '</span>' : '') +
+    '</div>').join('') + '</div>';
+}
+
+function renderReveal() {
+  const r = Q.room;
+  const qn = r.question || { text: '', options: [], correct: -1 };
+  const mine = r.answers && r.answers[r.qIndex] && r.answers[r.qIndex][Q.uid];
+  const me = (r.players && r.players[Q.uid]) || {};
+  let result;
+  if (mine && mine.choice === qn.correct) result = '✅ Correct! +' + (me.last || 0);
+  else if (mine) result = '❌ Not quite';
+  else result = '⏰ Too slow';
+  const isLast = r.qIndex + 1 >= r.total;
+  root().innerHTML =
+    '<div class="quiz-meta"><span>Question ' + (r.qIndex + 1) + ' of ' + r.total + '</span><span>Results</span></div>' +
+    BANNER +
+    '<div class="quiz-q">' + esc(qn.text) + '</div>' +
+    '<div class="quiz-opts">' +
+    (qn.options || []).map((o, i) => {
+      let cls = 'quiz-opt';
+      if (i === qn.correct) cls += ' correct';
+      else if (mine && mine.choice === i) cls += ' wrong';
+      return '<button class="' + cls + '" disabled>' + esc(o) + '</button>';
+    }).join('') +
+    '</div>' +
+    '<div class="quiz-result" style="margin-top:16px;">' + result + '</div>' +
+    boardHtml(ranked(), true, 5) +
+    '<div class="quiz-btn-row" style="margin-top:16px;">' +
+    (Q.isHost
+      ? '<button class="btn btn-primary" onclick="Quiz.next()">' + (isLast ? 'Final Results 🏆' : 'Next Question ➡️') + '</button>'
+      : '<div class="quiz-sub">Waiting for the host...</div>') +
+    '</div>';
+}
+
+function renderFinished() {
+  const board = ranked();
+  let head = '🏆 Game over';
+  if (board.length) {
+    const tie = board.length > 1 && (board[0].score || 0) === (board[1].score || 0);
+    head = tie ? '🏆 It\'s a tie at the top!' : '🏆 ' + esc(board[0].name) + ' wins!';
+  }
+  root().innerHTML =
+    '<div class="quiz-center"><div class="card-title">Final Scores</div>' +
+    '<div class="quiz-result">' + head + '</div></div>' +
+    boardHtml(board, false, 0) +
+    '<div class="quiz-btn-row" style="margin-top:16px;">' +
+    '<button class="btn btn-secondary" onclick="Quiz.leave()">' + (Q.isHost ? 'Close Room' : 'Back to Menu') + '</button>' +
+    '</div>';
+}
+
+// ─────────────────────────────────────────────
+// HOST: GAME FLOW
+// ─────────────────────────────────────────────
+function advance() {
+  const r = Q.room;
+  if (!Q.isHost || !r) return;
+  const idx = r.qIndex + 1;
+  if (idx >= r.total) { Q.ref.update({ status: 'finished' }); return; }
+  Q.ref.update({
+    qIndex: idx,
+    status: 'question',
+    question: Q.questions[idx],
+    qStart: firebase.database.ServerValue.TIMESTAMP
+  }).catch((e) => toast('Could not continue: ' + e.message, true));
+}
+function start() {
+  if (Q.room && Q.room.status === 'lobby') advance();
+}
+function next() {
+  if (Q.room && Q.room.status === 'reveal') advance();
+}
+
+function doReveal() {
+  const r = Q.room;
+  if (!Q.isHost || !r || r.status !== 'question' || !Q.secret) return;
+  const idx = r.qIndex;
+  const correct = Q.secret[idx];
+  const dur = r.duration * 1000;
+  const ans = (r.answers && r.answers[idx]) || {};
+  const updates = {};
+  players().forEach((p) => {
+    const a = ans[p.id];
+    let pts = 0;
+    if (a && a.choice === correct && typeof a.ts === 'number') {
+      let el = a.ts - r.qStart;
+      if (el <= dur + 1500) {
+        el = Math.max(0, Math.min(el, dur));
+        pts = Math.round(500 + 500 * (1 - el / dur));
+      }
+    }
+    updates['players/' + p.id + '/score'] = (p.score || 0) + pts;
+    updates['players/' + p.id + '/last'] = pts;
+  });
+  updates['question/correct'] = correct;
+  updates['status'] = 'reveal';
+  Q.ref.update(updates).catch((e) => toast('Could not show results: ' + e.message, true));
+}
+
+function tick() {
+  const r = Q.room;
+  if (!r || r.status !== 'question' || !r.qStart) return;
+  const dur = r.duration * 1000;
+  const left = dur - (serverNow() - r.qStart);
+  const bar = $('quiz-timer-bar'), num = $('quiz-timer-num');
+  if (bar) {
+    bar.style.width = Math.max(0, Math.min(100, left / dur * 100)) + '%';
+    bar.classList.toggle('low', left < 5000);
+  }
+  if (num) num.textContent = Math.max(0, Math.ceil(left / 1000)) + 's';
+  if (Q.isHost && Q.revealed !== r.qIndex) {
+    const ps = players().filter((p) => p.connected !== false);
+    const ans = (r.answers && r.answers[r.qIndex]) || {};
+    const all = ps.length > 0 && ps.every((p) => ans[p.id]);
+    if (left <= 0 || all) {
+      Q.revealed = r.qIndex;
+      setTimeout(doReveal, all ? 400 : 900);
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// PUBLIC API (used by onclick handlers)
+// ─────────────────────────────────────────────
+window.Quiz = {
+  open: open, menu: renderMenu, hostSetup: hostSetup, create: create, join: join,
+  start: start, next: next, pick: pick, leave: leave,
+  _state: Q, _internals: { doReveal: doReveal, tick: tick, XMAS_BANK: XMAS_BANK, makeQ: makeQ }
+};
+})();
+</script>
+
 </body>
 </html>
